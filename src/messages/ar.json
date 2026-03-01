@@ -1,0 +1,17 @@
+{
+    "Auth": {
+        "loginTitle": "مرحباً بعودتك",
+        "loginSubtitle": "قم بتسجيل الدخول للوصول إلى لوحة التحكم",
+        "registerTitle": "إنشاء حساب",
+        "registerSubtitle": "انضم إلينا وقم بإدارة مهامك بكفاءة",
+        "userName": "اسم المستخدم",
+        "fullName": "الاسم الكامل",
+        "password": "كلمة المرور",
+        "loginSubmit": "تسجيل الدخول",
+        "registerSubmit": "إنشاء حساب",
+        "noAccount": "ليس لديك حساب؟",
+        "haveAccount": "لديك حساب بالفعل؟",
+        "registerSuccess": "تم التسجيل بنجاح، يرجى تسجيل الدخول.",
+        "dashboard": "لوحة التحكم"
+    }
+}

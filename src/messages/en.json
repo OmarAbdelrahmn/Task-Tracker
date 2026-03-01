@@ -1,0 +1,17 @@
+{
+    "Auth": {
+        "loginTitle": "Welcome Back",
+        "loginSubtitle": "Sign in to access your dashboard",
+        "registerTitle": "Create Account",
+        "registerSubtitle": "Join us and manage your tasks efficiently",
+        "userName": "Username",
+        "fullName": "Full Name",
+        "password": "Password",
+        "loginSubmit": "Sign In",
+        "registerSubmit": "Register",
+        "noAccount": "Don't have an account?",
+        "haveAccount": "Already have an account?",
+        "registerSuccess": "Registered successfully, please sign in.",
+        "dashboard": "Dashboard"
+    }
+}
