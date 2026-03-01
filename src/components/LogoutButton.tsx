@@ -2,7 +2,7 @@
 
 import { AuthService } from '@/services/auth.service';
 
-export function LogoutButton({ locale }: { locale: string }) {
+export function LogoutButton({ locale, label = 'Logout' }: { locale: string; label?: string }) {
     const handleLogout = async () => {
         // Ping the API to revoke the token, clears JS-Cookies inside
         await AuthService.logout();
@@ -25,7 +25,7 @@ export function LogoutButton({ locale }: { locale: string }) {
                 fontSize: '1.05rem',
                 fontWeight: 500
             }}>
-            Logout
+            {label}
         </button>
     );
 }

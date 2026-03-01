@@ -13,5 +13,35 @@
         "haveAccount": "لديك حساب بالفعل؟",
         "registerSuccess": "تم التسجيل بنجاح، يرجى تسجيل الدخول.",
         "dashboard": "لوحة التحكم"
+    },
+    "Dashboard": {
+        "overview": "نظرة عامة",
+        "adminPanel": "لوحة الإدارة",
+        "settings": "الإعدادات",
+        "logout": "تسجيل الخروج",
+        "locale": "اللغة",
+        "userPortal": "بوابة",
+        "activeTasks": "المهام النشطة",
+        "completedForms": "النماذج المكتملة",
+        "pendingActions": "الإجراءات المعلقة",
+        "welcomeMessage": "مرحباً بك في النظرة العامة. أنت مسجل دخولك كـ",
+        "appName": ".تراكر"
+    },
+    "Profile": {
+        "title": "ملفي الشخصي",
+        "subtitle": "إدارة معلومات حسابك وصورتك الشخصية",
+        "currentAvatar": "الصورة الحالية",
+        "updateAvatar": "تحديث الصورة الشخصية",
+        "chooseImage": "اختر ملف صورة",
+        "uploadButton": "رفع الصورة",
+        "uploading": "جارٍ الرفع...",
+        "successMessage": "تم تحديث الصورة الشخصية بنجاح!",
+        "errorMessage": "فشل تحديث الصورة الشخصية. يرجى المحاولة مرة أخرى.",
+        "backToDashboard": "العودة إلى لوحة التحكم",
+        "noAvatarPlaceholder": "لا توجد صورة شخصية",
+        "accountInfo": "معلومات الحساب",
+        "userName": "اسم المستخدم",
+        "fullName": "الاسم الكامل",
+        "address": "العنوان"
     }
 }

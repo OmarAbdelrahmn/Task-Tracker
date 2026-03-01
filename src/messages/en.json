@@ -13,5 +13,35 @@
         "haveAccount": "Already have an account?",
         "registerSuccess": "Registered successfully, please sign in.",
         "dashboard": "Dashboard"
+    },
+    "Dashboard": {
+        "overview": "Overview",
+        "adminPanel": "Admin Panel",
+        "settings": "Settings",
+        "logout": "Logout",
+        "locale": "Locale",
+        "userPortal": "Portal",
+        "activeTasks": "Active Tasks",
+        "completedForms": "Completed Forms",
+        "pendingActions": "Pending Actions",
+        "welcomeMessage": "Welcome to the main overview. You are logged in as a",
+        "appName": "Tracker."
+    },
+    "Profile": {
+        "title": "My Profile",
+        "subtitle": "Manage your account information and avatar",
+        "currentAvatar": "Current Avatar",
+        "updateAvatar": "Update Avatar",
+        "chooseImage": "Choose an image file",
+        "uploadButton": "Upload Avatar",
+        "uploading": "Uploading...",
+        "successMessage": "Avatar updated successfully!",
+        "errorMessage": "Failed to update avatar. Please try again.",
+        "backToDashboard": "Back to Dashboard",
+        "noAvatarPlaceholder": "No avatar set",
+        "accountInfo": "Account Information",
+        "userName": "Username",
+        "fullName": "Full Name",
+        "address": "Address"
     }
 }

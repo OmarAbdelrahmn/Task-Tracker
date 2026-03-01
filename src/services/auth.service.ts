@@ -22,7 +22,19 @@ export interface ApiErrorResponse {
     };
 }
 
+export interface UserProfile {
+    userName: string;
+    fullName: string;
+    address: string;
+    avatarUrl: string | null;
+}
+
 export class AuthService {
+    static async getMe(): Promise<UserProfile> {
+        const response = await api.get<UserProfile>('/api/me');
+        return response.data;
+    }
+
     static async signIn(userName: string, password: string): Promise<AuthResponse> {
         const response = await api.post<AuthResponse>('/api/Auth/signin', {
             userName,
@@ -42,6 +54,16 @@ export class AuthService {
             userName,
             fullName,
             password
+        });
+        return response.data;
+    }
+
+    static async updateAvatar(file: File): Promise<{ avatarUrl: string }> {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await api.put<{ avatarUrl: string }>('/api/me/avatar', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
         });
         return response.data;
     }

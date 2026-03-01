@@ -1,7 +1,7 @@
 import axios from 'axios';
 import TokenManager from './TokenManager';
 
-export const API_BASE_URL = 'https://taskmanager.premiumasp.net/';
+export const API_BASE_URL = 'https://taskmanager.premiumasp.net';
 
 export const api = axios.create({
     baseURL: API_BASE_URL,
@@ -26,6 +26,11 @@ api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
+
+        // Bypass refresh logic and redirect if the original request was for authentication
+        if (originalRequest.url?.includes('/api/Auth/signin') || originalRequest.url?.includes('/api/Auth/register')) {
+            return Promise.reject(error);
+        }
 
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
