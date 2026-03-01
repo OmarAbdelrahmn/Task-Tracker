@@ -35,6 +35,15 @@ export class AuthService {
         return response.data;
     }
 
+    static async updateInfo(fullName: string, address: string): Promise<void> {
+        await api.put('/api/me/info', { fullName, address });
+    }
+
+    static async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+        // Note: API body key is "newPassord" (API typo — kept intentionally)
+        await api.put('/api/me/change-password', { currentPassword, newPassord: newPassword });
+    }
+
     static async signIn(userName: string, password: string): Promise<AuthResponse> {
         const response = await api.post<AuthResponse>('/api/Auth/signin', {
             userName,

@@ -44,7 +44,7 @@ export default async function DashboardLayout({
                             {t('adminPanel')}
                         </a>
                     )}
-                    <a href="#" style={{ color: 'var(--text-muted)', fontSize: '1.05rem', transition: 'color 0.2s' }}>
+                    <a href={`/${locale}/dashboard/settings`} style={{ color: 'var(--text-muted)', fontSize: '1.05rem', transition: 'color 0.2s' }}>
                         {t('settings')}
                     </a>
                 </nav>

@@ -42,6 +42,37 @@
         "accountInfo": "معلومات الحساب",
         "userName": "اسم المستخدم",
         "fullName": "الاسم الكامل",
-        "address": "العنوان"
+        "address": "العنوان",
+        "editInfo": "تعديل المعلومات",
+        "saveInfo": "حفظ التغييرات",
+        "savingInfo": "جارٍ الحفظ...",
+        "infoSuccess": "تم تحديث الملف الشخصي بنجاح!",
+        "infoError": "فشل تحديث الملف الشخصي. يرجى المحاولة مرة أخرى.",
+        "changePassword": "تغيير كلمة المرور",
+        "currentPassword": "كلمة المرور الحالية",
+        "newPassword": "كلمة المرور الجديدة",
+        "changePasswordButton": "تحديث كلمة المرور",
+        "changingPassword": "جارٍ التحديث...",
+        "passwordSuccess": "تم تغيير كلمة المرور بنجاح!",
+        "passwordError": "فشل تغيير كلمة المرور. يرجى المحاولة مرة أخرى."
+    },
+    "Settings": {
+        "title": "الإعدادات",
+        "subtitle": "خصص تجربتك",
+        "appearance": "المظهر",
+        "darkMode": "الوضع المظلم",
+        "lightMode": "الوضع الفاتح",
+        "systemMode": "افتراضي النظام",
+        "accentColor": "لون التمييز",
+        "language": "اللغة",
+        "languageSubtitle": "اختر لغتك المفضلة",
+        "english": "الإنجليزية",
+        "arabic": "العربية",
+        "blue": "أزرق",
+        "violet": "بنفسجي",
+        "rose": "وردي",
+        "amber": "كهرماني",
+        "emerald": "زمرد",
+        "cyan": "سماوي"
     }
 }

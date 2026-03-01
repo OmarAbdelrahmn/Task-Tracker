@@ -5,6 +5,7 @@ import { routing } from '@/i18n/routing';
 import { Inter, Cairo } from 'next/font/google';
 import '../globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { AccentColorProvider } from '@/components/AccentColorProvider';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const cairo = Cairo({ subsets: ['arabic'], variable: '--font-cairo' });
@@ -34,6 +35,7 @@ export default async function LocaleLayout({
             <body className={`${inter.variable} ${cairo.variable}`}>
                 <NextIntlClientProvider messages={messages}>
                     <ThemeProvider>
+                        <AccentColorProvider />
                         {children}
                     </ThemeProvider>
                 </NextIntlClientProvider>

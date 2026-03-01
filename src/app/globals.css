@@ -21,6 +21,15 @@
   --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 }
 
+/* ── Accent color palettes ── */
+[data-accent="blue"]   { --primary: #3b82f6; --primary-hover: #2563eb; --secondary: #8b5cf6; }
+[data-accent="violet"] { --primary: #7c3aed; --primary-hover: #6d28d9; --secondary: #a78bfa; }
+[data-accent="rose"]   { --primary: #e11d48; --primary-hover: #be123c; --secondary: #fb7185; }
+[data-accent="amber"]  { --primary: #d97706; --primary-hover: #b45309; --secondary: #fbbf24; }
+[data-accent="emerald"]{ --primary: #059669; --primary-hover: #047857; --secondary: #34d399; }
+[data-accent="cyan"]   { --primary: #0891b2; --primary-hover: #0e7490; --secondary: #22d3ee; }
+
+
 .dark {
   /* Sleek Dark Theme */
   --background: #0f172a;

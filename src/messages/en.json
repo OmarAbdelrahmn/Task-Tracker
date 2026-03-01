@@ -42,6 +42,37 @@
         "accountInfo": "Account Information",
         "userName": "Username",
         "fullName": "Full Name",
-        "address": "Address"
+        "address": "Address",
+        "editInfo": "Edit Info",
+        "saveInfo": "Save Changes",
+        "savingInfo": "Saving...",
+        "infoSuccess": "Profile updated successfully!",
+        "infoError": "Failed to update profile. Please try again.",
+        "changePassword": "Change Password",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "changePasswordButton": "Update Password",
+        "changingPassword": "Updating...",
+        "passwordSuccess": "Password changed successfully!",
+        "passwordError": "Failed to change password. Please try again."
+    },
+    "Settings": {
+        "title": "Settings",
+        "subtitle": "Customize your experience",
+        "appearance": "Appearance",
+        "darkMode": "Dark Mode",
+        "lightMode": "Light Mode",
+        "systemMode": "System Default",
+        "accentColor": "Accent Color",
+        "language": "Language",
+        "languageSubtitle": "Choose your preferred language",
+        "english": "English",
+        "arabic": "Arabic",
+        "blue": "Blue",
+        "violet": "Violet",
+        "rose": "Rose",
+        "amber": "Amber",
+        "emerald": "Emerald",
+        "cyan": "Cyan"
     }
 }
