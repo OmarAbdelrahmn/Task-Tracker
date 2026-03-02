@@ -134,8 +134,8 @@ export default function SettingsPage({ params }: { params: Promise<{ locale: str
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     {[
-                        { code: 'en', label: t('english'), flag: '🇬🇧' },
-                        { code: 'ar', label: t('arabic'), flag: '🇸🇦' },
+                        { code: 'en', label: t('english'), flag: 'EN' },
+                        { code: 'ar', label: t('arabic'), flag: 'AR' },
                     ].map(({ code, label, flag }) => {
                         const active = locale === code;
                         return (
