@@ -79,7 +79,7 @@ export default function SettingsPage({ params }: { params: Promise<{ locale: str
 
                 {/* Light / Dark / System */}
                 {mounted && (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '2rem' }}>
+                    <div className="settings-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '2rem' }}>
                         {themeOptions.map(({ value, icon, label }) => {
                             const active = theme === value;
                             return (
@@ -90,7 +90,7 @@ export default function SettingsPage({ params }: { params: Promise<{ locale: str
                                         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
                                         padding: '1rem 0.5rem', borderRadius: '10px', cursor: 'pointer',
                                         border: active ? '2px solid var(--primary)' : '2px solid var(--surface-border)',
-                                        background: active ? 'rgba(var(--primary-rgb, 59,130,246), 0.08)' : 'var(--surface)',
+                                        background: active ? 'color-mix(in srgb, var(--primary) 8%, transparent)' : 'var(--surface)',
                                         color: active ? 'var(--primary)' : 'var(--text-muted)',
                                         fontFamily: 'inherit', fontSize: '0.8rem', fontWeight: active ? 600 : 400,
                                         transition: 'all 0.2s',
@@ -132,7 +132,7 @@ export default function SettingsPage({ params }: { params: Promise<{ locale: str
                 {sectionTitle(t('language'))}
                 <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>{t('languageSubtitle')}</p>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className="settings-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     {[
                         { code: 'en', label: t('english'), flag: 'EN' },
                         { code: 'ar', label: t('arabic'), flag: 'AR' },
@@ -146,7 +146,7 @@ export default function SettingsPage({ params }: { params: Promise<{ locale: str
                                     display: 'flex', alignItems: 'center', gap: '0.75rem',
                                     padding: '1rem 1.25rem', borderRadius: '10px', cursor: 'pointer',
                                     border: active ? '2px solid var(--primary)' : '2px solid var(--surface-border)',
-                                    background: active ? 'rgba(var(--primary-rgb, 59,130,246), 0.08)' : 'var(--surface)',
+                                    background: active ? 'color-mix(in srgb, var(--primary) 8%, transparent)' : 'var(--surface)',
                                     color: active ? 'var(--primary)' : 'var(--foreground)',
                                     fontFamily: 'inherit', fontSize: '0.95rem', fontWeight: active ? 600 : 400,
                                     transition: 'all 0.2s',

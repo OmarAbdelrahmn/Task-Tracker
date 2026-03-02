@@ -48,7 +48,7 @@ export function UserAvatarButton({ locale, userRole }: UserAvatarButtonProps) {
             }}
             onMouseEnter={(e) => {
                 (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--primary)';
-                (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 0 0 3px rgba(var(--primary-rgb, 99,102,241), 0.2)';
+                (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent)';
             }}
             onMouseLeave={(e) => {
                 (e.currentTarget as HTMLAnchorElement).style.borderColor = 'transparent';
