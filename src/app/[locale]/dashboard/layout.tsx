@@ -25,12 +25,14 @@ export default async function DashboardLayout({
     const userRole = cookieStore.get('userRole')?.value || 'User';
     const t = await getTranslations('Dashboard');
     const tp = await getTranslations('Profile');
+    const tm = await getTranslations('Tasks');
     const isRtl = locale === 'ar';
 
     const labels = {
         appName: t('appName'),
         userPortal: t('userPortal'),
         overview: t('overview'),
+        myTasks: tm('myTasks'),
         adminPanel: t('adminPanel'),
         settings: t('settings'),
         profile: tp('title'),

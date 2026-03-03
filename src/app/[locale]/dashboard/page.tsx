@@ -1,14 +1,19 @@
 import { getTranslations } from 'next-intl/server';
 import { cookies } from 'next/headers';
+import { CreateTaskButton } from '@/components/CreateTaskButton';
 
-export default async function DashboardOverview() {
-    const t = await getTranslations('Login'); // We can make a separate Dashboard dict later
+export default async function DashboardOverview({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params;
+    const t = await getTranslations('Dashboard');
     const cookieStore = await cookies();
     const userRole = cookieStore.get('userRole')?.value || 'User';
 
     return (
         <div className="animate-fade-in">
-            <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '1rem' }}>Dashboard Overview</h1>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
+                <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>{t('overview') || 'Dashboard Overview'}</h1>
+                <CreateTaskButton locale={locale} />
+            </div>
             <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Welcome to the main overview. You are logged in as a <strong>{userRole}</strong>.</p>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>

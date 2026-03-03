@@ -67,6 +67,11 @@ export class AuthService {
         return response.data;
     }
 
+    static async checkUsername(userName: string): Promise<{ isAvailable: boolean }> {
+        const response = await api.get<{ isAvailable: boolean }>(`/api/me/check-username?userName=${encodeURIComponent(userName)}`);
+        return response.data;
+    }
+
     static async updateAvatar(file: File): Promise<{ avatarUrl: string }> {
         const formData = new FormData();
         formData.append('file', file);

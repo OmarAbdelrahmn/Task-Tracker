@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from 'next-intl';
-import { useState, use } from 'react';
+import { useState, use, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AuthService } from '@/services/auth.service';
 import { Eye, EyeOff } from 'lucide-react';
@@ -12,9 +12,36 @@ export default function RegisterPage({ params }: { params: Promise<{ locale: str
     const router = useRouter();
 
     const [userName, setUserName] = useState('');
+    const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean | null>(null);
+    const [checkingUsername, setCheckingUsername] = useState(false);
     const [fullName, setFullName] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+
+    useEffect(() => {
+        const checkUsername = async () => {
+            if (!userName || userName.trim().length === 0) {
+                setIsUsernameAvailable(null);
+                return;
+            }
+
+            setCheckingUsername(true);
+            try {
+                const res = await AuthService.checkUsername(userName);
+                setIsUsernameAvailable(res.isAvailable);
+            } catch (err) {
+                setIsUsernameAvailable(null);
+            } finally {
+                setCheckingUsername(false);
+            }
+        };
+
+        const timeoutId = setTimeout(() => {
+            checkUsername();
+        }, 500);
+
+        return () => clearTimeout(timeoutId);
+    }, [userName]);
 
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
@@ -64,14 +91,35 @@ export default function RegisterPage({ params }: { params: Promise<{ locale: str
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     <div>
                         <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>{t('userName')}</label>
-                        <input
-                            type="text"
-                            className="input-field"
-                            placeholder="user123"
-                            value={userName}
-                            onChange={(e) => setUserName(e.target.value)}
-                            required
-                        />
+                        <div style={{ position: 'relative' }}>
+                            <input
+                                type="text"
+                                className="input-field"
+                                placeholder="user123"
+                                value={userName}
+                                onChange={(e) => setUserName(e.target.value)}
+                                style={{
+                                    borderColor: isUsernameAvailable === true ? 'var(--success, #10b981)' : isUsernameAvailable === false ? 'var(--danger, #ef4444)' : undefined,
+                                    outlineColor: isUsernameAvailable === true ? 'var(--success, #10b981)' : isUsernameAvailable === false ? 'var(--danger, #ef4444)' : undefined,
+                                }}
+                                required
+                            />
+                            {checkingUsername && (
+                                <span style={{ position: 'absolute', right: locale === 'ar' ? 'unset' : '10px', left: locale === 'ar' ? '10px' : 'unset', top: '50%', transform: 'translateY(-50%)', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                    ...
+                                </span>
+                            )}
+                        </div>
+                        {isUsernameAvailable === false && (
+                            <div style={{ color: 'var(--danger, #ef4444)', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                                {t('usernameTaken') || 'Username is not available'}
+                            </div>
+                        )}
+                        {isUsernameAvailable === true && (
+                            <div style={{ color: 'var(--success, #10b981)', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                                {t('usernameAvailable') || 'Username is available'}
+                            </div>
+                        )}
                     </div>
                     <div>
                         <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>{t('fullName')}</label>
@@ -107,7 +155,7 @@ export default function RegisterPage({ params }: { params: Promise<{ locale: str
                         </div>
                     </div>
 
-                    <button type="submit" className="btn btn-primary" style={{ marginTop: '0.5rem', width: '100%', opacity: loading ? 0.7 : 1 }} disabled={loading}>
+                    <button type="submit" className="btn btn-primary" style={{ marginTop: '0.5rem', width: '100%', opacity: loading || isUsernameAvailable === false ? 0.7 : 1 }} disabled={loading || isUsernameAvailable === false}>
                         {loading ? '...' : t('registerSubmit')}
                     </button>
                 </form>

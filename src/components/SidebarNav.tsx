@@ -1,13 +1,14 @@
 "use client";
 
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Settings, User, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Settings, User, ShieldCheck, ListTodo } from 'lucide-react';
 
 interface SidebarNavProps {
     locale: string;
     userRole: string;
     labels: {
         overview: string;
+        myTasks: string;
         profile: string;
         settings: string;
         adminPanel: string;
@@ -19,6 +20,7 @@ export function SidebarNav({ locale, userRole, labels }: SidebarNavProps) {
 
     const navItems = [
         { href: `/${locale}/dashboard`, label: labels.overview, icon: <LayoutDashboard size={18} /> },
+        { href: `/${locale}/dashboard/tasks`, label: labels.myTasks, icon: <ListTodo size={18} /> },
         { href: `/${locale}/dashboard/profile`, label: labels.profile, icon: <User size={18} /> },
         { href: `/${locale}/dashboard/settings`, label: labels.settings, icon: <Settings size={18} /> },
         ...(userRole === 'Admin'

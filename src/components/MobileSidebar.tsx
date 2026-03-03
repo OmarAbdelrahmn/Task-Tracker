@@ -10,6 +10,7 @@ interface MobileSidebarProps {
         appName: string;
         userPortal: string;
         overview: string;
+        myTasks: string;
         adminPanel: string;
         settings: string;
         profile: string;
@@ -35,6 +36,7 @@ export function MobileSidebar({ locale, userRole, labels, LogoutButtonComponent 
 
     const navItems = [
         { href: `/${locale}/dashboard`, label: labels.overview, icon: <LayoutDashboard size={18} /> },
+        { href: `/${locale}/dashboard/tasks`, label: labels.myTasks, icon: <LayoutDashboard size={18} /> },
         { href: `/${locale}/dashboard/profile`, label: labels.profile, icon: <User size={18} /> },
         { href: `/${locale}/dashboard/settings`, label: labels.settings, icon: <Settings size={18} /> },
         ...(userRole === 'Admin' ? [{ href: `/${locale}/dashboard/admin`, label: labels.adminPanel, icon: <ShieldCheck size={18} /> }] : []),
