@@ -1,6 +1,14 @@
 import { api } from '@/lib/api';
 import TokenManager from '@/lib/TokenManager';
 
+const getHeaders = (extraHeaders: Record<string, string> = {}) => {
+    const token = TokenManager.getAccessToken();
+    return {
+        ...extraHeaders,
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
+    };
+};
+
 export interface AuthResponse {
     id: string;
     userName: string;
@@ -31,17 +39,17 @@ export interface UserProfile {
 
 export class AuthService {
     static async getMe(): Promise<UserProfile> {
-        const response = await api.get<UserProfile>('/api/me');
+        const response = await api.get<UserProfile>('/api/me', { headers: getHeaders() });
         return response.data;
     }
 
     static async updateInfo(fullName: string, address: string): Promise<void> {
-        await api.put('/api/me/info', { fullName, address });
+        await api.put('/api/me/info', { fullName, address }, { headers: getHeaders() });
     }
 
     static async changePassword(currentPassword: string, newPassword: string): Promise<void> {
         // Note: API body key is "newPassord" (API typo — kept intentionally)
-        await api.put('/api/me/change-password', { currentPassword, newPassord: newPassword });
+        await api.put('/api/me/change-password', { currentPassword, newPassord: newPassword }, { headers: getHeaders() });
     }
 
     static async signIn(userName: string, password: string): Promise<AuthResponse> {
@@ -77,7 +85,7 @@ export class AuthService {
         formData.append('file', file);
 
         const response = await api.put<{ avatarUrl: string }>('/api/me/avatar', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
+            headers: getHeaders({ 'Content-Type': 'multipart/form-data' })
         });
         return response.data;
     }

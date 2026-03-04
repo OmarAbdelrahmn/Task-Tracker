@@ -140,5 +140,16 @@
         "confirmDeleteYes": "Delete",
         "addAssignee": "Add",
         "removeAssignee": "Remove"
+    },
+    "Messages": {
+        "discussion": "Discussion",
+        "chatTitle": "Task Discussion",
+        "chatSubtitle": "Collaborate in real-time on this task.",
+        "typeMessage": "Type a message...",
+        "someoneIsTyping": "Someone is typing...",
+        "severalPeopleTyping": "Several people are typing...",
+        "noMessages": "No messages yet. Start the conversation!",
+        "messageDeleted": "This message was deleted",
+        "edited": "edited"
     }
 }

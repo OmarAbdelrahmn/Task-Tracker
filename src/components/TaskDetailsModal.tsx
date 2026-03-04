@@ -6,9 +6,10 @@ import { TaskService, TaskResponse, UpdateTaskRequest, AssignableUser } from '@/
 import {
     X, Calendar, User as UserIcon, AlertCircle, FileText,
     CheckCircle2, RotateCw, Clock, History, File, Trash2, Edit3,
-    Save, Plus, UserMinus, Loader2
+    Save, Plus, UserMinus, Loader2, MessageSquare
 } from 'lucide-react';
 import { API_BASE_URL } from '@/lib/api';
+import { TaskChatModal } from './chat/TaskChatModal';
 
 interface TaskDetailsModalProps {
     taskId: number | null;
@@ -54,6 +55,9 @@ export function TaskDetailsModal({ taskId, isOpen, onClose, onDeleted, onUpdated
     // Delete
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [deleting, setDeleting] = useState(false);
+
+    // Chat
+    const [isChatOpen, setIsChatOpen] = useState(false);
 
     useEffect(() => {
         if (isOpen && taskId) {
@@ -252,6 +256,11 @@ export function TaskDetailsModal({ taskId, isOpen, onClose, onDeleted, onUpdated
                         {task && !isEditing && (
                             <button onClick={startEdit} title={t('edit') || 'Edit'} style={{ background: 'var(--surface)', border: 'none', cursor: 'pointer', color: 'var(--primary)', padding: '0.45rem', borderRadius: '8px', display: 'flex' }}>
                                 <Edit3 size={16} />
+                            </button>
+                        )}
+                        {task && task.conversationId && !isEditing && (
+                            <button onClick={() => setIsChatOpen(true)} title="Discussion" style={{ background: 'var(--surface)', border: 'none', cursor: 'pointer', color: 'var(--primary)', padding: '0.45rem', borderRadius: '8px', display: 'flex' }}>
+                                <MessageSquare size={16} />
                             </button>
                         )}
                         {task && !confirmDelete && (
@@ -530,6 +539,15 @@ export function TaskDetailsModal({ taskId, isOpen, onClose, onDeleted, onUpdated
                 </div>
             </div>
             <style dangerouslySetInnerHTML={{ __html: `@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }` }} />
+
+            <TaskChatModal
+                isOpen={isChatOpen}
+                onClose={() => setIsChatOpen(false)}
+                taskId={task?.id ?? null}
+                taskTitle={task?.title ?? ''}
+                conversationId={task?.conversationId ? Number(task.conversationId) : null}
+                locale={locale}
+            />
         </div>
     );
 }

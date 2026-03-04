@@ -1,4 +1,13 @@
 import { api } from '@/lib/api';
+import TokenManager from '@/lib/TokenManager';
+
+const getHeaders = (extraHeaders: Record<string, string> = {}) => {
+    const token = TokenManager.getAccessToken();
+    return {
+        ...extraHeaders,
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
+    };
+};
 
 export interface AssignableUser {
     id: string;
@@ -104,48 +113,48 @@ export interface CreateTaskRequest {
 
 export class TaskService {
     static async getAssignableUsers(): Promise<AssignableUser[]> {
-        const response = await api.get<AssignableUser[]>('/api/me/assignable');
+        const response = await api.get<AssignableUser[]>('/api/me/assignable', { headers: getHeaders() });
         return response.data;
     }
 
     static async getMyTasks(): Promise<TaskSummaryResponse[]> {
-        const response = await api.get<TaskSummaryResponse[]>('/api/tasks/my');
+        const response = await api.get<TaskSummaryResponse[]>('/api/tasks/my', { headers: getHeaders() });
         return response.data;
     }
 
     static async getTaskById(id: number): Promise<TaskResponse> {
-        const response = await api.get<TaskResponse>(`/api/tasks/${id}`);
+        const response = await api.get<TaskResponse>(`/api/tasks/${id}`, { headers: getHeaders() });
         return response.data;
     }
 
     static async createTask(data: CreateTaskRequest): Promise<any> {
-        const response = await api.post('/api/tasks', data);
+        const response = await api.post('/api/tasks', data, { headers: getHeaders() });
         return response.data;
     }
 
     // PUT /api/tasks/{id}
     static async updateTask(id: number, data: UpdateTaskRequest): Promise<any> {
-        const response = await api.put(`/api/tasks/${id}`, data);
+        const response = await api.put(`/api/tasks/${id}`, data, { headers: getHeaders() });
         return response.data;
     }
 
     // DELETE /api/tasks/{id}
     static async deleteTask(id: number): Promise<void> {
-        await api.delete(`/api/tasks/${id}`);
+        await api.delete(`/api/tasks/${id}`, { headers: getHeaders() });
     }
 
     // PATCH /api/tasks/{id}/progress
     static async updateProgress(id: number, progress: number): Promise<void> {
-        await api.patch(`/api/tasks/${id}/progress`, { progress });
+        await api.patch(`/api/tasks/${id}/progress`, { progress }, { headers: getHeaders() });
     }
 
     // POST /api/tasks/{id}/assignees
     static async addAssignee(id: number, userId: string): Promise<void> {
-        await api.post(`/api/tasks/${id}/assignees`, { userId });
+        await api.post(`/api/tasks/${id}/assignees`, { userId }, { headers: getHeaders() });
     }
 
     // DELETE /api/tasks/{id}/assignees/{userId}
     static async removeAssignee(id: number, userId: string): Promise<void> {
-        await api.delete(`/api/tasks/${id}/assignees/${userId}`);
+        await api.delete(`/api/tasks/${id}/assignees/${userId}`, { headers: getHeaders() });
     }
 }

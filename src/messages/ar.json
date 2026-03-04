@@ -141,5 +141,16 @@
         "confirmDeleteYes": "حذف",
         "addAssignee": "إضافة",
         "removeAssignee": "إزالة"
+    },
+    "Messages": {
+        "discussion": "المناقشة",
+        "chatTitle": "مناقشة المهمة",
+        "chatSubtitle": "تعاون في الوقت الفعلي حول هذه المهمة.",
+        "typeMessage": "اكتب رسالة...",
+        "someoneIsTyping": "شخص ما يكتب...",
+        "severalPeopleTyping": "عدة أشخاص يكتبون...",
+        "noMessages": "لا توجد رسائل بعد. ابدأ المحادثة!",
+        "messageDeleted": "تم حذف هذه الرسالة",
+        "edited": "معدلة"
     }
 }
