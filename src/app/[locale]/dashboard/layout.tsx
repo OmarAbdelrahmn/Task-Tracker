@@ -52,8 +52,10 @@ export default async function DashboardLayout({
         <div className={`dashboard-root${isRtl ? ' rtl' : ''}`}>
             {/* ── Desktop Sidebar (hidden on mobile) ── */}
             <aside className="glass desktop-sidebar">
-                <h2 className="sidebar-title">{t('appName')}</h2>
-                <span className="sidebar-role">{userRole} {t('userPortal')}</span>
+                <div className="sidebar-brand-block">
+                    <h2 className="sidebar-title">{t('appName')}</h2>
+                    <span className="sidebar-role"> {t('userPortal')}   {userRole}</span>
+                </div>
 
                 <SidebarNav locale={locale} userRole={userRole} labels={labels} />
 

@@ -39,6 +39,7 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
     const [isRenamingGroup, setIsRenamingGroup] = useState(false);
     const [newGroupName, setNewGroupName] = useState('');
     const [isSavingGroupInfo, setIsSavingGroupInfo] = useState(false);
+    const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
     // Search messages state
     const [showSearch, setShowSearch] = useState(false);
@@ -256,8 +257,8 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
                 subtitle: `${memberCount} members`,
                 preview,
                 timestamp: formatTimestamp(lastMsg?.createdAt ?? conv.createdAt),
-                avatarEl: renderGroupIcon(),
-                headerAvatarEl: renderGroupIcon(42),
+                avatarEl: conv.avatarUrl ? renderCircleAvatar(conv.avatarUrl, conv.name || 'Group Chat') : renderGroupIcon(),
+                headerAvatarEl: conv.avatarUrl ? renderCircleAvatar(conv.avatarUrl, conv.name || 'Group Chat', 42) : renderGroupIcon(42),
                 isOnline: null as boolean | null,
             };
         } else if (type === 'taskthread') {
@@ -268,8 +269,8 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
                 subtitle: 'Task thread',
                 preview,
                 timestamp: formatTimestamp(lastMsg?.createdAt ?? conv.createdAt),
-                avatarEl: renderGroupIcon(),
-                headerAvatarEl: renderGroupIcon(42),
+                avatarEl: conv.avatarUrl ? renderCircleAvatar(conv.avatarUrl, conv.name || 'Task') : renderGroupIcon(),
+                headerAvatarEl: conv.avatarUrl ? renderCircleAvatar(conv.avatarUrl, conv.name || 'Task', 42) : renderGroupIcon(42),
                 isOnline: null as boolean | null,
             };
         } else {
@@ -347,6 +348,25 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
             alert('Failed to update group');
         } finally {
             setIsSavingGroupInfo(false);
+        }
+    };
+
+    const handleGroupAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !infoDetails) return;
+        setIsUploadingAvatar(true);
+        try {
+            const result = await ConversationService.updateGroupAvatar(infoDetails.id, file);
+            const newAvatarUrl = result.avatarUrl;
+            setInfoDetails(prev => prev ? { ...prev, avatarUrl: newAvatarUrl } : prev);
+            setSelectedConversation(prev => prev?.id === infoDetails.id ? { ...prev, avatarUrl: newAvatarUrl } : prev);
+            setConversations(prev => prev.map(c => c.id === infoDetails.id ? { ...c, avatarUrl: newAvatarUrl } : c));
+        } catch (err) {
+            console.error('Failed to update group avatar', err);
+            alert('Failed to upload group avatar.');
+        } finally {
+            setIsUploadingAvatar(false);
+            e.target.value = '';
         }
     };
 
@@ -887,7 +907,36 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
                                 <div>
                                     {/* Group header card */}
                                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', padding: '1rem', marginBottom: '1.5rem', borderRadius: '12px', background: 'var(--surface)', border: '1px solid var(--surface-border)', position: 'relative' }}>
-                                        {renderGroupIcon(64)}
+                                        {/* Clickable avatar with camera overlay — group & task threads */}
+                                        {(resolveType(infoDetails.type) === 'group' || resolveType(infoDetails.type) === 'taskthread') ? (
+                                            <label style={{ cursor: isUploadingAvatar ? 'not-allowed' : 'pointer', position: 'relative', display: 'inline-block' }}>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    style={{ display: 'none' }}
+                                                    onChange={handleGroupAvatarUpload}
+                                                    disabled={isUploadingAvatar}
+                                                />
+                                                {/* Avatar circle */}
+                                                <div style={{ width: '64px', height: '64px', borderRadius: '50%', overflow: 'hidden', background: 'var(--surface-border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    {isUploadingAvatar ? (
+                                                        <Loader2 size={28} className="spin" color="var(--text-muted)" />
+                                                    ) : infoDetails.avatarUrl ? (
+                                                        <img src={getAvatarUrl(infoDetails.avatarUrl) ?? ''} alt={infoDetails.name ?? 'Group'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    ) : (
+                                                        <Users size={28} color="var(--text-muted)" />
+                                                    )}
+                                                </div>
+                                                {/* Camera badge */}
+                                                {!isUploadingAvatar && (
+                                                    <div style={{ position: 'absolute', bottom: 0, right: 0, width: '22px', height: '22px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--surface)' }}>
+                                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
+                                                    </div>
+                                                )}
+                                            </label>
+                                        ) : (
+                                            renderGroupIcon(64)
+                                        )}
                                         {isRenamingGroup ? (
                                             <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', width: '100%' }}>
                                                 <input

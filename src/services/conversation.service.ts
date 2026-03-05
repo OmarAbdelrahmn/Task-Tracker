@@ -47,6 +47,7 @@ export interface ConversationSummary {
     id: number;
     type: 'Direct' | 'Group' | 'TaskThread';
     name: string | null;
+    avatarUrl: string | null;
     taskId: number | null;
     participants: Participant[];
     lastMessage: Message | null;
@@ -137,6 +138,17 @@ export class ConversationService {
         const response = await api.post<Omit<MessageFile, 'id'>>(`/api/conversations/${conversationId}/files`, formData, {
             headers: getHeaders({ 'Content-Type': 'multipart/form-data' })
         });
+        return response.data;
+    }
+
+    static async updateGroupAvatar(id: number, file: File): Promise<{ avatarUrl: string }> {
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await api.put<{ avatarUrl: string }>(
+            `/api/conversations/${id}/avatar`,
+            formData,
+            { headers: getHeaders({ 'Content-Type': 'multipart/form-data' }) }
+        );
         return response.data;
     }
 
