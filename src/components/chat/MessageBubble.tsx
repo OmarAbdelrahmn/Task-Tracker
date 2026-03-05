@@ -21,6 +21,76 @@ export function MessageBubble({ message, currentUserId, participants }: MessageB
     const normalizedAvatarPath = rawAvatarUrl ? (rawAvatarUrl.startsWith('/') ? rawAvatarUrl : `/${rawAvatarUrl}`) : '';
     const finalAvatarUrl = rawAvatarUrl ? (rawAvatarUrl.startsWith('http') ? rawAvatarUrl : `${normalizedApiBaseUrl}${normalizedAvatarPath}`) : null;
 
+    const IMAGE_EXTS = /\.(jpe?g|png|gif|webp|bmp|svg)(\?.*)?$/i;
+    const URL_RE = /^https?:\/\/\S+$/;
+
+    /**
+     * Render the body: each line is checked.
+     * - If it's an image URL → render inline <img>
+     * - If it's any other URL → render a styled download link
+     * - Otherwise → plain text
+     */
+    const renderBody = (body: string) => {
+        const lines = body.split('\n');
+        return lines.map((line, i) => {
+            const trimmed = line.trim();
+            if (URL_RE.test(trimmed)) {
+                if (IMAGE_EXTS.test(trimmed)) {
+                    return (
+                        <a key={i} href={trimmed} target="_blank" rel="noopener noreferrer">
+                            <img
+                                src={trimmed}
+                                alt="attachment"
+                                style={{
+                                    maxWidth: '100%',
+                                    maxHeight: '260px',
+                                    borderRadius: '10px',
+                                    display: 'block',
+                                    marginBottom: lines.length > 1 ? '0.5rem' : 0,
+                                    cursor: 'pointer',
+                                    objectFit: 'contain',
+                                }}
+                            />
+                        </a>
+                    );
+                } else {
+                    const fileName = trimmed.split('/').pop() ?? 'file';
+                    return (
+                        <a
+                            key={i}
+                            href={trimmed}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download={fileName}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                padding: '0.5rem',
+                                background: isMine ? 'rgba(255,255,255,0.2)' : 'var(--background)',
+                                borderRadius: '8px',
+                                textDecoration: 'none',
+                                color: 'inherit',
+                                fontSize: '0.9rem',
+                                marginBottom: lines.length > 1 ? '0.4rem' : 0,
+                            }}
+                        >
+                            <FileText size={18} />
+                            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {fileName}
+                            </span>
+                            <Download size={16} />
+                        </a>
+                    );
+                }
+            }
+            // Plain text line
+            return trimmed
+                ? <div key={i} style={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>{line}</div>
+                : <br key={i} />;
+        });
+    };
+
     return (
         <div style={{
             display: 'flex',
@@ -28,7 +98,7 @@ export function MessageBubble({ message, currentUserId, participants }: MessageB
             alignItems: isMine ? 'flex-end' : 'flex-start',
             marginBottom: '1rem',
         }}>
-            {/* Sender Name & Avatar (only show if not mine) */}
+            {/* Sender Name & Avatar (only for others) */}
             {!isMine && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                     {finalAvatarUrl ? (
@@ -55,9 +125,9 @@ export function MessageBubble({ message, currentUserId, participants }: MessageB
                 background: isMine ? 'linear-gradient(135deg, var(--primary), var(--secondary))' : 'var(--surface)',
                 color: isMine ? 'white' : 'var(--foreground)',
                 border: isMine ? 'none' : '1px solid var(--surface-border)',
-                boxShadow: 'var(--shadow-sm)'
+                boxShadow: 'var(--shadow-sm)',
             }}>
-                {/* Reply To Preview (Optional) */}
+                {/* Reply preview */}
                 {message.replyTo && (
                     <div style={{
                         background: 'rgba(0,0,0,0.1)', borderLeft: '3px solid currentcolor',
@@ -70,35 +140,50 @@ export function MessageBubble({ message, currentUserId, participants }: MessageB
                     </div>
                 )}
 
-                {/* Deleted State */}
+                {/* Content */}
                 {message.isDeleted ? (
                     <span style={{ fontStyle: 'italic', opacity: 0.7 }}>This message was deleted</span>
                 ) : (
                     <>
-                        {/* Text Body */}
+                        {/* Smart body: text | image URL | file URL */}
                         {message.body && (
-                            <div style={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
-                                {message.body}
-                                {message.isEdited && <span style={{ fontSize: '0.7rem', opacity: 0.7, marginLeft: '0.5rem' }}>(edited)</span>}
+                            <div>
+                                {renderBody(message.body)}
+                                {message.isEdited && (
+                                    <span style={{ fontSize: '0.7rem', opacity: 0.7, marginLeft: '0.5rem' }}>(edited)</span>
+                                )}
                             </div>
                         )}
 
-                        {/* File Attachments */}
+                        {/* Explicit file attachments from files[] array */}
                         {message.files && message.files.length > 0 && (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: message.body ? '0.75rem' : 0 }}>
-                                {message.files.map(f => (
-                                    <a key={f.id} href={f.fileUrl} target="_blank" rel="noopener noreferrer" download={f.fileName}
-                                        style={{
-                                            display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem',
-                                            background: isMine ? 'rgba(255,255,255,0.2)' : 'var(--background)',
-                                            borderRadius: '8px', textDecoration: 'none', color: 'inherit',
-                                            fontSize: '0.9rem'
-                                        }}>
-                                        <FileText size={18} />
-                                        <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.fileName}</span>
-                                        <Download size={16} />
-                                    </a>
-                                ))}
+                                {message.files.map(f => {
+                                    const isImage = IMAGE_EXTS.test(f.fileUrl);
+                                    if (isImage) {
+                                        return (
+                                            <a key={f.id} href={f.fileUrl} target="_blank" rel="noopener noreferrer">
+                                                <img
+                                                    src={f.fileUrl}
+                                                    alt={f.fileName}
+                                                    style={{ maxWidth: '100%', maxHeight: '260px', borderRadius: '10px', display: 'block', objectFit: 'contain', cursor: 'pointer' }}
+                                                />
+                                            </a>
+                                        );
+                                    }
+                                    return (
+                                        <a key={f.id} href={f.fileUrl} target="_blank" rel="noopener noreferrer" download={f.fileName}
+                                            style={{
+                                                display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem',
+                                                background: isMine ? 'rgba(255,255,255,0.2)' : 'var(--background)',
+                                                borderRadius: '8px', textDecoration: 'none', color: 'inherit', fontSize: '0.9rem'
+                                            }}>
+                                            <FileText size={18} />
+                                            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.fileName}</span>
+                                            <Download size={16} />
+                                        </a>
+                                    );
+                                })}
                             </div>
                         )}
                     </>

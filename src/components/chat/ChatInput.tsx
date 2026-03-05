@@ -71,6 +71,7 @@ export function ChatInput({ conversationId, onTypingStart, onTypingStop, onSendM
 
                 await ConversationService.sendMessage(conversationId, bodyMsg, 1);
                 setFile(null);
+                setText('');
                 if (fileInputRef.current) fileInputRef.current.value = '';
             } else {
                 // Just text
