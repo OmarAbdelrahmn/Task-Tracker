@@ -4,7 +4,16 @@ import TokenManager from './TokenManager';
 import { API_BASE_URL } from './api';
 import { Message } from '@/services/conversation.service';
 
-export function useSignalR(conversationId: number | null) {
+interface SignalRCallbacks {
+    onUserOnline?: (userId: string) => void;
+    onUserOffline?: (userId: string) => void;
+    onConversationUpdated?: (conversationId: number, newName: string) => void;
+    onParticipantLeft?: (conversationId: number, userId: string) => void;
+    onConversationDeleted?: (conversationId: number) => void;
+    onReceiveMessage?: (message: Message) => void;
+}
+
+export function useSignalR(conversationId: number | null, callbacks?: SignalRCallbacks) {
     const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
     const [isConnected, setIsConnected] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -12,10 +21,13 @@ export function useSignalR(conversationId: number | null) {
     const [error, setError] = useState<string | null>(null);
     const connectionRef = useRef<signalR.HubConnection | null>(null);
 
+    const callbacksRef = useRef(callbacks);
+    useEffect(() => {
+        callbacksRef.current = callbacks;
+    }, [callbacks]);
+
     // Initialize Connection
     useEffect(() => {
-        if (!conversationId) return;
-
         const initSignalR = async () => {
             const newConnection = new signalR.HubConnectionBuilder()
                 .withUrl(`${API_BASE_URL}/hubs/chat`, {
@@ -29,13 +41,14 @@ export function useSignalR(conversationId: number | null) {
 
             // Setup Event Handlers
             newConnection.on('ReceiveMessage', (message: Message) => {
-                if (message.conversationId === conversationId) {
+                if (conversationId === null || message.conversationId === conversationId) {
                     setMessages(prev => {
                         // Prevent duplicates
                         if (prev.some(m => m.id === message.id)) return prev;
                         return [...prev, message];
                     });
                 }
+                callbacksRef.current?.onReceiveMessage?.(message);
             });
 
             newConnection.on('MessageEdited', (editedMessage: Message) => {
@@ -72,10 +85,24 @@ export function useSignalR(conversationId: number | null) {
 
             newConnection.on('UserOnline', (userId: string) => {
                 console.log('User online:', userId);
+                callbacksRef.current?.onUserOnline?.(userId);
             });
 
             newConnection.on('UserOffline', (userId: string) => {
                 console.log('User offline:', userId);
+                callbacksRef.current?.onUserOffline?.(userId);
+            });
+
+            newConnection.on('ConversationUpdated', ({ conversationId: evtConvId, newName }: { conversationId: number, newName: string }) => {
+                callbacksRef.current?.onConversationUpdated?.(evtConvId, newName);
+            });
+
+            newConnection.on('ParticipantLeft', ({ conversationId: evtConvId, userId }: { conversationId: number, userId: string }) => {
+                callbacksRef.current?.onParticipantLeft?.(evtConvId, userId);
+            });
+
+            newConnection.on('ConversationDeleted', ({ conversationId: evtConvId }: { conversationId: number }) => {
+                callbacksRef.current?.onConversationDeleted?.(evtConvId);
             });
 
             newConnection.on('Error', (errMessage: string) => {
@@ -89,7 +116,9 @@ export function useSignalR(conversationId: number | null) {
                 setConnection(newConnection);
 
                 // Ensure we join the specific conversation room explicitly even if server auto-joins based on DB
-                await newConnection.invoke('JoinConversation', conversationId);
+                if (conversationId) {
+                    await newConnection.invoke('JoinConversation', conversationId);
+                }
             } catch (err) {
                 console.error('Error connecting to SignalR', err);
                 setIsConnected(false);
@@ -100,7 +129,7 @@ export function useSignalR(conversationId: number | null) {
 
         return () => {
             if (connectionRef.current) {
-                if (connectionRef.current.state === signalR.HubConnectionState.Connected) {
+                if (connectionRef.current.state === signalR.HubConnectionState.Connected && conversationId) {
                     connectionRef.current.invoke('LeaveConversation', conversationId).catch(console.error);
                 }
                 connectionRef.current.stop();

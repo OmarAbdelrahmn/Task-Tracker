@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useSignalR } from '@/lib/useSignalR';
-import { ConversationService, Message } from '@/services/conversation.service';
+import { ConversationService, Message, Participant } from '@/services/conversation.service';
 import { MessageBubble } from './MessageBubble';
 import { ChatInput } from './ChatInput';
 import TokenManager from '@/lib/TokenManager';
@@ -8,9 +8,10 @@ import { Loader2 } from 'lucide-react';
 
 interface ChatWindowProps {
     conversationId: number;
+    participants?: Participant[];
 }
 
-export function ChatWindow({ conversationId }: ChatWindowProps) {
+export function ChatWindow({ conversationId, participants }: ChatWindowProps) {
     const {
         isConnected, messages, typingUsers, error,
         sendTypingStart, sendTypingStop, appendMessages, setMessages
@@ -155,13 +156,13 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
 
                 {/* Display real messages */}
                 {messages.map(msg => (
-                    <MessageBubble key={`msg-${msg.id}`} message={msg} currentUserId={currentUserId} />
+                    <MessageBubble key={`msg-${msg.id}`} message={msg} currentUserId={currentUserId} participants={participants} />
                 ))}
 
                 {/* Display optimistic messages with opacity */}
                 {optimisticMessages.map(msg => (
                     <div key={`opt-${msg.id}`} style={{ opacity: 0.6 }}>
-                        <MessageBubble message={msg} currentUserId={currentUserId} />
+                        <MessageBubble message={msg} currentUserId={currentUserId} participants={participants} />
                     </div>
                 ))}
 

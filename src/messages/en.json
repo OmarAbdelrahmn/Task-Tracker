@@ -27,7 +27,8 @@
         "completedForms": "Completed Forms",
         "pendingActions": "Pending Actions",
         "welcomeMessage": "Welcome to the main overview. You are logged in as a",
-        "appName": "Tracker."
+        "appName": "Tracker.",
+        "messages": "Messages"
     },
     "Profile": {
         "title": "My Profile",

@@ -37,10 +37,12 @@ export default async function DashboardLayout({
         settings: t('settings'),
         profile: tp('title'),
         logout: t('logout'),
+        messages: t('messages'),
     };
 
     const navItems = [
         { href: `/${locale}/dashboard`, label: t('overview'), icon: 'overview' },
+        { href: `/${locale}/dashboard/messages`, label: t('messages'), icon: 'messages' },
         { href: `/${locale}/dashboard/profile`, label: tp('title'), icon: 'profile' },
         { href: `/${locale}/dashboard/settings`, label: t('settings'), icon: 'settings' },
         ...(userRole === 'Admin' ? [{ href: `/${locale}/dashboard/admin`, label: t('adminPanel'), icon: 'admin' }] : []),

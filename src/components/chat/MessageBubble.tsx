@@ -1,15 +1,25 @@
 import React from 'react';
-import { Message } from '@/services/conversation.service';
+import { Message, Participant } from '@/services/conversation.service';
 import { FileText, Download } from 'lucide-react';
 import { format } from 'date-fns';
+import { API_BASE_URL } from '@/lib/api';
 
 interface MessageBubbleProps {
     message: Message;
     currentUserId: string;
+    participants?: Participant[];
 }
 
-export function MessageBubble({ message, currentUserId }: MessageBubbleProps) {
+export function MessageBubble({ message, currentUserId, participants }: MessageBubbleProps) {
     const isMine = message.senderId === currentUserId;
+
+    // Use participant's avatar if available, fallback to message's senderAvatar
+    const senderParticipant = participants?.find(p => p.userId === message.senderId);
+    const rawAvatarUrl = senderParticipant?.avatarUrl || message.senderAvatar;
+
+    const normalizedApiBaseUrl = API_BASE_URL.replace(/\/$/, '');
+    const normalizedAvatarPath = rawAvatarUrl ? (rawAvatarUrl.startsWith('/') ? rawAvatarUrl : `/${rawAvatarUrl}`) : '';
+    const finalAvatarUrl = rawAvatarUrl ? (rawAvatarUrl.startsWith('http') ? rawAvatarUrl : `${normalizedApiBaseUrl}${normalizedAvatarPath}`) : null;
 
     return (
         <div style={{
@@ -21,8 +31,8 @@ export function MessageBubble({ message, currentUserId }: MessageBubbleProps) {
             {/* Sender Name & Avatar (only show if not mine) */}
             {!isMine && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                    {message.senderAvatar ? (
-                        <img src={message.senderAvatar} alt={message.senderName} style={{ width: 24, height: 24, borderRadius: '50%' }} />
+                    {finalAvatarUrl ? (
+                        <img src={finalAvatarUrl} alt={message.senderName} style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover' }} />
                     ) : (
                         <div style={{
                             width: 24, height: 24, borderRadius: '50%', background: 'var(--primary)',

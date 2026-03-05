@@ -27,7 +27,8 @@
         "completedForms": "النماذج المكتملة",
         "pendingActions": "الإجراءات المعلقة",
         "welcomeMessage": "مرحباً بك في النظرة العامة. أنت مسجل دخولك كـ",
-        "appName": ".تراكر"
+        "appName": ".تراكر",
+        "messages": "الرسائل"
     },
     "Profile": {
         "title": "ملفي الشخصي",

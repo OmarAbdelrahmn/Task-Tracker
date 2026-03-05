@@ -62,6 +62,10 @@ export interface PaginatedMessages {
     totalPages: number;
 }
 
+export interface UnreadCountResponse {
+    totalUnread: number;
+}
+
 export class ConversationService {
     static async getConversations(): Promise<ConversationSummary[]> {
         const response = await api.get<ConversationSummary[]>('/api/conversations', { headers: getHeaders() });
@@ -79,7 +83,11 @@ export class ConversationService {
     }
 
     static async createGroupConversation(name: string, memberIds: string[]): Promise<ConversationSummary> {
-        const response = await api.post<ConversationSummary>('/api/conversations/group', { name, memberIds }, { headers: getHeaders() });
+        const payload = {
+            name: name,
+            memberIds: memberIds
+        };
+        const response = await api.post<ConversationSummary>('/api/conversations/group', payload, { headers: getHeaders() });
         return response.data;
     }
 
@@ -129,6 +137,32 @@ export class ConversationService {
         const response = await api.post<Omit<MessageFile, 'id'>>(`/api/conversations/${conversationId}/files`, formData, {
             headers: getHeaders({ 'Content-Type': 'multipart/form-data' })
         });
+        return response.data;
+    }
+
+    static async updateGroup(id: number, newName: string): Promise<ConversationSummary> {
+        const response = await api.put<ConversationSummary>(`/api/conversations/${id}`, { newName }, { headers: getHeaders() });
+        return response.data;
+    }
+
+    static async leaveConversation(id: number): Promise<void> {
+        await api.post(`/api/conversations/${id}/leave`, {}, { headers: getHeaders() });
+    }
+
+    static async deleteConversation(id: number): Promise<void> {
+        await api.delete(`/api/conversations/${id}`, { headers: getHeaders() });
+    }
+
+    static async getUnreadCount(): Promise<UnreadCountResponse> {
+        const response = await api.get<UnreadCountResponse>('/api/conversations/unread', { headers: getHeaders() });
+        return response.data;
+    }
+
+    static async searchMessages(id: number, query: string, page: number = 1, pageSize: number = 30): Promise<PaginatedMessages> {
+        const response = await api.get<PaginatedMessages>(
+            `/api/conversations/${id}/messages/search?query=${encodeURIComponent(query)}&page=${page}&pageSize=${pageSize}`,
+            { headers: getHeaders() }
+        );
         return response.data;
     }
 }
