@@ -27,7 +27,7 @@
         "completedForms": "النماذج المكتملة",
         "pendingActions": "الإجراءات المعلقة",
         "welcomeMessage": "مرحباً بك في النظرة العامة. أنت مسجل دخولك كـ",
-        "appName": ".تراكر",
+        "appName": "مدير المهام",
         "messages": "الرسائل"
     },
     "Profile": {
@@ -79,6 +79,9 @@
         "cyan": "سماوي"
     },
     "Tasks": {
+        "all": "الكل",
+        "notDone": "غير مكتمل",
+        "done": "مكتمل",
         "createTask": "إنشاء مهمة",
         "title": "عنوان المهمة",
         "titlePlaceholder": "عنوان المهمة",

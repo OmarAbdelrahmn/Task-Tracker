@@ -105,7 +105,7 @@ export default function SettingsPage({ params }: { params: Promise<{ locale: str
                 )}
 
                 {/* Accent colors */}
-                {sectionTitle(t('accentColor'))}
+                {/* {sectionTitle(t('accentColor'))}
                 <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                     {ACCENT_COLORS.map(({ key, primary, secondary }) => (
                         <button
@@ -124,7 +124,7 @@ export default function SettingsPage({ params }: { params: Promise<{ locale: str
                             {accent === key && <Check size={16} color="white" strokeWidth={3} />}
                         </button>
                     ))}
-                </div>
+                </div> */}
             </div>
 
             {/* ── Language ── */}

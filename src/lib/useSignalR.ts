@@ -84,12 +84,10 @@ export function useSignalR(conversationId: number | null, callbacks?: SignalRCal
             });
 
             newConnection.on('UserOnline', (userId: string) => {
-                console.log('User online:', userId);
                 callbacksRef.current?.onUserOnline?.(userId);
             });
 
             newConnection.on('UserOffline', (userId: string) => {
-                console.log('User offline:', userId);
                 callbacksRef.current?.onUserOffline?.(userId);
             });
 

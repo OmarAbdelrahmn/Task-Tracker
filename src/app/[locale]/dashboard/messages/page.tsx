@@ -7,7 +7,7 @@ import { TaskService, AssignableUser } from '@/services/task.service';
 import { AuthService } from '@/services/auth.service';
 import { ChatWindow } from '@/components/chat/ChatWindow';
 import { useSignalR } from '@/lib/useSignalR';
-import { Users, User, MessageSquarePlus, Loader2, ArrowLeft, Check, X, Search, Edit2, LogOut, Trash2 } from 'lucide-react';
+import { Users, User, MessageSquarePlus, Loader2, ArrowLeft, Check, X, Search, Edit2, LogOut, Trash2, ChevronLeft } from 'lucide-react';
 import TokenManager from '@/lib/TokenManager';
 import { API_BASE_URL } from '@/lib/api';
 
@@ -21,6 +21,12 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
     const [selectedConversation, setSelectedConversation] = useState<ConversationSummary | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    // Pre-fetched messages cache: conversationId -> Message[]
+    const [prefetchedMessages, setPrefetchedMessages] = useState<Map<number, Message[]>>(new Map());
+
+    // Mobile view state: 'list' shows sidebar, 'chat' shows the chat panel
+    const [isMobile, setIsMobile] = useState(false);
+    const [mobileView, setMobileView] = useState<'list' | 'chat'>('list');
 
     const [showNewChatOverlay, setShowNewChatOverlay] = useState(false);
     const [assignableUsers, setAssignableUsers] = useState<AssignableUser[]>([]);
@@ -79,17 +85,46 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
         try {
             const data = await ConversationService.getConversations();
             // Sort by last message time descending, fallback to createdAt
-            setConversations(data.sort((a, b) => {
+            const sorted = data.sort((a, b) => {
                 const aTime = a.lastMessage?.createdAt ?? a.createdAt;
                 const bTime = b.lastMessage?.createdAt ?? b.createdAt;
                 return new Date(bTime).getTime() - new Date(aTime).getTime();
-            }));
+            });
+            setConversations(sorted);
+
+            // Auto-select the first conversation so the chat is immediately visible
+            if (sorted.length > 0) {
+                setSelectedConversation(prev => prev ?? sorted[0]);
+            }
+
+            // Pre-fetch messages for the first 5 conversations in parallel
+            const top5 = sorted.slice(0, 5);
+            const results = await Promise.allSettled(
+                top5.map(c => ConversationService.getMessages(c.id, 1, 50))
+            );
+            setPrefetchedMessages(prev => {
+                const next = new Map(prev);
+                results.forEach((result, idx) => {
+                    if (result.status === 'fulfilled') {
+                        next.set(top5[idx].id, result.value.items);
+                    }
+                });
+                return next;
+            });
         } catch (error) {
             console.error('Failed to load conversations', error);
         } finally {
             setIsLoading(false);
         }
     };
+
+    // Detect mobile screen size
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth <= 768);
+        check();
+        window.addEventListener('resize', check);
+        return () => window.removeEventListener('resize', check);
+    }, []);
 
     useEffect(() => {
         loadConversations();
@@ -516,9 +551,19 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
     });
 
     return (
-        <div style={{ display: 'flex', height: '100%', minHeight: 0, gap: '1rem' }}>
+        <div style={{ display: 'flex', height: '100%', minHeight: 0, gap: isMobile ? 0 : '1rem' }}>
             {/* ─── Sidebar ─── */}
-            <div className="glass" style={{ width: '320px', display: 'flex', flexDirection: 'column', flexShrink: 0, height: '100%', overflow: 'hidden' }}>
+            <div
+                className="glass"
+                style={{
+                    width: isMobile ? '100%' : '320px',
+                    display: isMobile && mobileView === 'chat' ? 'none' : 'flex',
+                    flexDirection: 'column',
+                    flexShrink: 0,
+                    height: '100%',
+                    overflow: 'hidden',
+                }}
+            >
                 {/* Header */}
                 <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h2 style={{ fontSize: '1.4rem', fontWeight: 700, margin: 0 }}>{tm('discussion')}</h2>
@@ -552,6 +597,7 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
                                     key={conv.id}
                                     onClick={() => {
                                         setSelectedConversation(conv);
+                                        if (isMobile) setMobileView('chat');
                                         if (conv.unreadCount > 0) {
                                             setConversations(prev => prev.map(c => c.id === conv.id ? { ...c, unreadCount: 0 } : c));
                                         }
@@ -623,7 +669,19 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
             </div>
 
             {/* ─── Main Chat Area ─── */}
-            <div className="glass" style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: 0, height: '100%', overflow: 'hidden' }}>
+            <div
+                className="glass"
+                style={{
+                    flex: 1,
+                    display: isMobile && mobileView === 'list' ? 'none' : 'flex',
+                    flexDirection: 'column',
+                    minWidth: 0,
+                    minHeight: 0,
+                    height: '100%',
+                    overflow: 'hidden',
+                    width: isMobile ? '100%' : undefined,
+                }}
+            >
                 {selectedConversation ? (
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                         {/* Chat Header — always clickable */}
@@ -632,14 +690,34 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
                             return (
                                 <div
                                     style={{
-                                        padding: '0.875rem 1.5rem',
+                                        padding: '0.875rem 1rem',
                                         borderBottom: '1px solid var(--border)',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'space-between',
                                         direction: isRtl ? 'rtl' : 'ltr',
+                                        gap: '0.5rem',
                                     }}
                                 >
+                                    {/* ← Back button on mobile */}
+                                    {isMobile && (
+                                        <button
+                                            onClick={() => setMobileView('list')}
+                                            style={{
+                                                background: 'transparent',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                color: 'var(--text-muted)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                padding: '0.25rem',
+                                                flexShrink: 0,
+                                            }}
+                                            aria-label="Back to conversations"
+                                        >
+                                            <ChevronLeft size={26} />
+                                        </button>
+                                    )}
                                     {/* Clickable Info Area */}
                                     <div
                                         onClick={handleHeaderClick}
@@ -674,7 +752,7 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
                                     {/* Header Actions */}
                                     <button
                                         onClick={() => setShowSearch(!showSearch)}
-                                        style={{ background: showSearch ? 'var(--surface)' : 'transparent', border: '1px solid var(--surface-border)', borderRadius: '50%', width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-muted)' }}
+                                        style={{ background: showSearch ? 'var(--surface)' : 'transparent', border: '1px solid var(--surface-border)', borderRadius: '50%', width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-muted)', flexShrink: 0 }}
                                     >
                                         <Search size={18} />
                                     </button>
@@ -731,6 +809,7 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
                                     key={selectedConversation.id}
                                     conversationId={selectedConversation.id}
                                     participants={selectedConversation.participants}
+                                    initialMessages={prefetchedMessages.get(selectedConversation.id)}
                                 />
                             )}
                         </div>

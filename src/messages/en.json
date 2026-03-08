@@ -27,7 +27,7 @@
         "completedForms": "Completed Forms",
         "pendingActions": "Pending Actions",
         "welcomeMessage": "Welcome to the main overview. You are logged in as a",
-        "appName": "Tracker.",
+        "appName": "Task Manager",
         "messages": "Messages"
     },
     "Profile": {
@@ -79,6 +79,9 @@
         "cyan": "Cyan"
     },
     "Tasks": {
+        "all": "All",
+        "notDone": "Not Done",
+        "done": "Done",
         "createTask": "Create Task",
         "title": "Title",
         "titlePlaceholder": "Task Title",

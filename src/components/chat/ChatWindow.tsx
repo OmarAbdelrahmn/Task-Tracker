@@ -9,9 +9,10 @@ import { Loader2 } from 'lucide-react';
 interface ChatWindowProps {
     conversationId: number;
     participants?: Participant[];
+    initialMessages?: Message[];
 }
 
-export function ChatWindow({ conversationId, participants }: ChatWindowProps) {
+export function ChatWindow({ conversationId, participants, initialMessages }: ChatWindowProps) {
     const {
         isConnected, messages, typingUsers, error,
         sendTypingStart, sendTypingStop, appendMessages, setMessages
@@ -27,6 +28,8 @@ export function ChatWindow({ conversationId, participants }: ChatWindowProps) {
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    // Track whether we've seeded from initialMessages so we only do it once per conversationId
+    const seededRef = useRef<number | null>(null);
 
     // Extract current user ID from token
     const token = TokenManager.getAccessToken();
@@ -40,10 +43,19 @@ export function ChatWindow({ conversationId, participants }: ChatWindowProps) {
                 // Mark as read upon entering
                 await ConversationService.markAsRead(conversationId);
 
+                // If parent pre-fetched messages for this conversation, use them directly
+                if (initialMessages && initialMessages.length > 0 && seededRef.current !== conversationId) {
+                    seededRef.current = conversationId;
+                    appendMessages(initialMessages);
+                    setPage(1);
+                    setHasMore(true); // allow loading older messages via infinite scroll
+                    setTimeout(() => {
+                        messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+                    }, 100);
+                    return;
+                }
+
                 const res = await ConversationService.getMessages(conversationId, 1, 50);
-                // API returns oldest first dynamically or newest first? The api spec says "oldest-first within the page. Load page 1 first, then page 2 for older history (infinite scroll upward)".
-                // Wait, if page 1 is oldest first, but infinite scroll *upward* loads older?
-                // Let's assume the API returns page 1 = newest 50. But they are sorted oldest to newest. Page 2 is older 50.
                 appendMessages(res.items);
                 setPage(1);
                 setHasMore(res.page < res.totalPages);

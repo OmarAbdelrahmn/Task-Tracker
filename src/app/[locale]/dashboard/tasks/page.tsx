@@ -17,6 +17,7 @@ export default function MyTasksPage() {
     const [error, setError] = useState<string | null>(null);
     const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+    const [filter, setFilter] = useState<string>('all');
 
     useEffect(() => {
         loadTasks();
@@ -26,7 +27,6 @@ export default function MyTasksPage() {
         try {
             setLoading(true);
             const data = await TaskService.getMyTasks();
-            console.log("Tasks Data:", data);
             setTasks(data);
             setError(null);
         } catch (err: any) {
@@ -81,11 +81,50 @@ export default function MyTasksPage() {
         }
     };
 
+    const filteredTasks = tasks.filter(task => {
+        if (filter === 'all') return true;
+        return task.status.toString() === filter;
+    });
+
     return (
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1rem', width: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
                 <h1 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>{t('myTasks')}</h1>
-                <CreateTaskButton locale={locale} onSuccess={loadTasks} />
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', background: 'var(--surface-hover)', borderRadius: '8px', padding: '0.25rem', overflowX: 'auto' }}>
+                        <button
+                            onClick={() => setFilter('all')}
+                            style={{ padding: '0.5rem 1rem', whiteSpace: 'nowrap', borderRadius: '6px', border: 'none', background: filter === 'all' ? 'var(--primary)' : 'transparent', color: filter === 'all' ? '#fff' : 'var(--text-muted)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500, transition: 'all 0.2s' }}
+                        >
+                            {t('all') || 'All'}
+                        </button>
+                        <button
+                            onClick={() => setFilter('0')}
+                            style={{ padding: '0.5rem 1rem', whiteSpace: 'nowrap', borderRadius: '6px', border: 'none', background: filter === '0' ? 'var(--primary)' : 'transparent', color: filter === '0' ? '#fff' : 'var(--text-muted)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500, transition: 'all 0.2s' }}
+                        >
+                            {t('statusTodo') || 'Todo'}
+                        </button>
+                        <button
+                            onClick={() => setFilter('1')}
+                            style={{ padding: '0.5rem 1rem', whiteSpace: 'nowrap', borderRadius: '6px', border: 'none', background: filter === '1' ? 'var(--primary)' : 'transparent', color: filter === '1' ? '#fff' : 'var(--text-muted)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500, transition: 'all 0.2s' }}
+                        >
+                            {t('statusInProgress') || 'In Progress'}
+                        </button>
+                        <button
+                            onClick={() => setFilter('2')}
+                            style={{ padding: '0.5rem 1rem', whiteSpace: 'nowrap', borderRadius: '6px', border: 'none', background: filter === '2' ? 'var(--primary)' : 'transparent', color: filter === '2' ? '#fff' : 'var(--text-muted)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500, transition: 'all 0.2s' }}
+                        >
+                            {t('statusDone') || 'Done'}
+                        </button>
+                        <button
+                            onClick={() => setFilter('3')}
+                            style={{ padding: '0.5rem 1rem', whiteSpace: 'nowrap', borderRadius: '6px', border: 'none', background: filter === '3' ? 'var(--primary)' : 'transparent', color: filter === '3' ? '#fff' : 'var(--text-muted)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500, transition: 'all 0.2s' }}
+                        >
+                            {t('statusCancelled') || 'Cancelled'}
+                        </button>
+                    </div>
+                    <CreateTaskButton locale={locale} onSuccess={loadTasks} />
+                </div>
             </div>
 
             {error && (
@@ -101,13 +140,13 @@ export default function MyTasksPage() {
                         <div key={i} style={{ height: '180px', background: 'var(--surface-hover)', borderRadius: '16px', animation: 'pulse 1.5s infinite ease-in-out' }} />
                     ))}
                 </div>
-            ) : tasks.length === 0 ? (
+            ) : filteredTasks.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '4rem 1rem', background: 'var(--surface, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border)' }}>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '1rem' }}>{t('noTasksFound') || 'No tasks assigned to you right now.'}</p>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '1rem' }}>{t('noTasksFound') || 'No tasks found.'}</p>
                 </div>
             ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                    {tasks.map(task => (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem' }}>
+                    {filteredTasks.map(task => (
                         <div key={task.id} className="glass-card animate-fade-in" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem', cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s' }} onClick={() => { setSelectedTaskId(task.id); setIsDetailsOpen(true); }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'none'}>
 
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>

@@ -120,7 +120,6 @@ export default function ProfilePage({ params }: { params: Promise<{ locale: stri
         setAvatarSuccess(false);
         try {
             const result = await AuthService.updateAvatar(selectedFile);
-            console.log(result);
             const newUrl = resolveAvatar(result?.avatarUrl);
             if (newUrl) {
                 Cookies.set('avatarUrl', newUrl, { secure: true, sameSite: 'strict' });
