@@ -47,11 +47,34 @@ class TokenManager {
         return !!this.getAccessToken();
     }
 
+    static getUserIdFromToken(): string {
+        const token = this.getAccessToken();
+        if (!token) return '';
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent((typeof window !== 'undefined' ? window.atob(base64) : atob(base64)).split('').map(function (c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            const payload = JSON.parse(jsonPayload);
+            return (
+                payload.nameid ||
+                payload.sub ||
+                payload.uid ||
+                payload.id ||
+                payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ||
+                ''
+            );
+        } catch (e) {
+            return '';
+        }
+    }
+
     static extractRoleFromToken(token: string): string {
         try {
             const base64Url = token.split('.')[1];
             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+            const jsonPayload = decodeURIComponent((typeof window !== 'undefined' ? window.atob(base64) : atob(base64)).split('').map(function (c) {
                 return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
             }).join(''));
             const payload = JSON.parse(jsonPayload);

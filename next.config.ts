@@ -11,7 +11,15 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "taskmanager.premiumasp.net",
+        pathname: "/uploads/**",
+      },
+    ],
+  },
 };
 
 export default withPWA(withNextIntl(nextConfig));

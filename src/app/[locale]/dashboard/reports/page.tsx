@@ -77,20 +77,8 @@ export default function ReportsPage() {
 
     // ── Initialization ──
     useEffect(() => {
-        const token = TokenManager.getAccessToken();
-        let currentId: string | null = null;
-        if (token) {
-            try {
-                const base64Url = token.split('.')[1];
-                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-                const decoded = JSON.parse(jsonPayload);
-                currentId = decoded.nameid || decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] || decoded.sub || decoded.id || decoded.uid;
-                if (currentId) setMyTokenId(currentId);
-            } catch (e) {
-                console.error("Failed to decode token", e);
-            }
-        }
+        const currentId = TokenManager.getUserIdFromToken();
+        if (currentId) setMyTokenId(currentId);
 
         Promise.all([
             TaskService.getAssignableUsers().catch(() => []),
@@ -264,7 +252,7 @@ export default function ReportsPage() {
             <td data-label={t('colPriority')} style={{ padding: '1rem 1.5rem' }}>
                 {getPriorityBadge(task.priority)}
             </td>
-            <td data-label={t('colDue')} style={{ padding: '1rem 1.5rem', color: 'var(--text-secondary)'}}>
+            <td data-label={t('colDue')} style={{ padding: '1rem 1.5rem', color: 'var(--text-secondary)' }}>
                 {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '—'}
                 {task.isOverdue && (
                     <span style={{ display: 'inline-block', marginLeft: '0.5rem', fontSize: '0.75rem', padding: '2px 6px', borderRadius: '4px', background: 'color-mix(in srgb, var(--danger) 15%, transparent)', color: 'var(--danger)' }}>

@@ -10,6 +10,7 @@ import { useSignalR } from '@/lib/useSignalR';
 import { Users, User, MessageSquarePlus, Loader2, ArrowLeft, Check, X, Search, Edit2, LogOut, Trash2, ChevronLeft } from 'lucide-react';
 import TokenManager from '@/lib/TokenManager';
 import { API_BASE_URL } from '@/lib/api';
+import { parseApiDate } from '@/lib/dateUtils';
 
 export default function MessagesPage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = use(params);
@@ -57,28 +58,7 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
     // Current user identity — resolved from /api/me (most reliable)
     // Falls back to decoding multiple possible JWT claim names
     const [currentUserName, setCurrentUserName] = useState<string>('');
-    const [currentUserIdStr, setCurrentUserIdStr] = useState<string>(() => {
-        try {
-            const token = TokenManager.getAccessToken();
-            if (!token) return '';
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
-                '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-            ).join(''));
-            const payload = JSON.parse(jsonPayload);
-            // Try every common claim name for the user id
-            return (
-                payload.nameid ||
-                payload.sub ||
-                payload.uid ||
-                payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ||
-                ''
-            );
-        } catch {
-            return '';
-        }
-    });
+    const [currentUserIdStr, setCurrentUserIdStr] = useState<string>(() => TokenManager.getUserIdFromToken());
 
     const loadConversations = async () => {
         setIsLoading(true);
@@ -88,7 +68,7 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
             const sorted = data.sort((a, b) => {
                 const aTime = a.lastMessage?.createdAt ?? a.createdAt;
                 const bTime = b.lastMessage?.createdAt ?? b.createdAt;
-                return new Date(bTime).getTime() - new Date(aTime).getTime();
+                return parseApiDate(bTime).getTime() - parseApiDate(aTime).getTime();
             });
             setConversations(sorted);
 
@@ -189,7 +169,7 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
     // WhatsApp-style relative timestamp
     const formatTimestamp = (isoString: string | null | undefined): string => {
         if (!isoString) return '';
-        const date = new Date(isoString);
+        const date = parseApiDate(isoString);
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const yesterdayStart = new Date(todayStart.getTime() - 86400000);
@@ -486,7 +466,7 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
             return newList.sort((a, b) => {
                 const aTime = a.lastMessage?.createdAt ?? a.createdAt;
                 const bTime = b.lastMessage?.createdAt ?? b.createdAt;
-                return new Date(bTime).getTime() - new Date(aTime).getTime();
+                return parseApiDate(bTime).getTime() - parseApiDate(aTime).getTime();
             });
         });
     };

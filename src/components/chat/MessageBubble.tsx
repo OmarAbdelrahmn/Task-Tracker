@@ -3,6 +3,7 @@ import { Message, Participant } from '@/services/conversation.service';
 import { FileText, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { API_BASE_URL } from '@/lib/api';
+import { parseApiDate } from '@/lib/dateUtils';
 
 interface MessageBubbleProps {
     message: Message;
@@ -11,7 +12,7 @@ interface MessageBubbleProps {
 }
 
 export function MessageBubble({ message, currentUserId, participants }: MessageBubbleProps) {
-    const isMine = message.senderId === currentUserId;
+    const isMine = message.senderId?.toLowerCase() === currentUserId?.toLowerCase();
 
     // Use participant's avatar if available, fallback to message's senderAvatar
     const senderParticipant = participants?.find(p => p.userId === message.senderId);
@@ -192,7 +193,7 @@ export function MessageBubble({ message, currentUserId, participants }: MessageB
 
             {/* Timestamp */}
             <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem', opacity: 0.8 }}>
-                {format(new Date(message.createdAt), 'p')}
+                {format(parseApiDate(message.createdAt), 'p')}
             </div>
         </div>
     );

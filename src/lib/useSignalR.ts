@@ -3,6 +3,7 @@ import * as signalR from '@microsoft/signalr';
 import TokenManager from './TokenManager';
 import { API_BASE_URL } from './api';
 import { Message } from '@/services/conversation.service';
+import { parseApiDate } from './dateUtils';
 
 interface SignalRCallbacks {
     onUserOnline?: (userId: string) => void;
@@ -162,9 +163,9 @@ export function useSignalR(conversationId: number | null, callbacks?: SignalRCal
             const uniqueNewMessages = newMessages.filter(m => !existingIds.has(m.id));
 
             if (prepend) {
-                return [...uniqueNewMessages, ...prev].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+                return [...uniqueNewMessages, ...prev].sort((a, b) => parseApiDate(a.createdAt).getTime() - parseApiDate(b.createdAt).getTime());
             } else {
-                return [...prev, ...uniqueNewMessages].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+                return [...prev, ...uniqueNewMessages].sort((a, b) => parseApiDate(a.createdAt).getTime() - parseApiDate(b.createdAt).getTime());
             }
         });
     }, []);

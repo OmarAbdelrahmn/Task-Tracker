@@ -32,8 +32,7 @@ export function ChatWindow({ conversationId, participants, initialMessages }: Ch
     const seededRef = useRef<number | null>(null);
 
     // Extract current user ID from token
-    const token = TokenManager.getAccessToken();
-    const currentUserId = token ? parseJwt(token).nameid || '' : '';
+    const currentUserId = TokenManager.getUserIdFromToken();
 
     // Load initial messages
     useEffect(() => {
