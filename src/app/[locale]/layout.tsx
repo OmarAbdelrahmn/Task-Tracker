@@ -17,6 +17,11 @@ export const metadata: Metadata = {
     keywords: ["task manager", "team collaboration", "real-time chat", "project management", "task tracking"],
     authors: [{ name: "Task Manager" }],
     themeColor: "#0D0D0D",
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: "default",
+        title: "Task Manager",
+    },
     openGraph: {
         type: "website",
         url: "https://expserco.pro/",
