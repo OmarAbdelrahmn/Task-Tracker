@@ -7,6 +7,7 @@ import { AuthService, UserProfile } from '@/services/auth.service';
 import { X, Calendar, User as UserIcon, Check } from 'lucide-react';
 import Image from 'next/image';
 import { API_BASE_URL } from '@/lib/api';
+import { resolveAvatar } from '@/lib/taskUtils';
 
 interface CreateTaskModalProps {
     isOpen: boolean;
@@ -232,18 +233,15 @@ export function CreateTaskModal({ isOpen, onClose, onSuccess, locale }: CreateTa
                                             <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', padding: '0.5rem' }}>{t('loading')}</p>
                                         ) : users.map(user => {
                                             const isSelected = selectedUserIds.includes(user.id);
-                                            // Handle both pascal and camel cases from the backend JSON safely
                                             const rawAvatarUrl = (user as any).AvatarUrl || user.avatarUrl;
-                                            const normalizedApiBaseUrl = API_BASE_URL.replace(/\/$/, '');
-                                            const normalizedAvatarPath = rawAvatarUrl ? (rawAvatarUrl.startsWith('/') ? rawAvatarUrl : `/${rawAvatarUrl}`) : '';
-                                            const finalAvatarUrl = rawAvatarUrl ? (rawAvatarUrl.startsWith('http') ? rawAvatarUrl : `${normalizedApiBaseUrl}${normalizedAvatarPath}`) : null;
+                                            const finalAvatarUrl = resolveAvatar(rawAvatarUrl, API_BASE_URL);
 
                                             return (
                                                 <div key={user.id} onClick={() => toggleUserSelection(user.id)}
                                                     style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.3rem 0.6rem', borderRadius: '20px', cursor: 'pointer', border: isSelected ? '1px solid var(--primary)' : '1px solid var(--border)', background: isSelected ? 'color-mix(in srgb, var(--primary) 10%, transparent)' : 'var(--surface)', transition: 'all 0.2s', width: 'fit-content' }}
                                                 >
-                                                    <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
-                                                        {finalAvatarUrl ? <img src={finalAvatarUrl} alt={user.userName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <UserIcon size={12} color="white" />}
+                                                    <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
+                                                        {finalAvatarUrl ? <Image src={finalAvatarUrl} alt={user.userName} fill style={{ objectFit: 'cover' }} sizes="24px" /> : <UserIcon size={12} color="white" />}
                                                     </div>
                                                     <span dir="auto" style={{ fontSize: '0.85rem', fontWeight: 500, whiteSpace: 'nowrap' }}>
                                                         {user.fullName || user.userName}

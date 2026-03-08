@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import Image from 'next/image';
 import { TaskService, TaskResponse, UpdateTaskRequest, AssignableUser } from '@/services/task.service';
 import {
     X, Calendar, User as UserIcon, AlertCircle, FileText,
@@ -9,6 +10,7 @@ import {
     Save, Plus, UserMinus, Loader2, MessageSquare
 } from 'lucide-react';
 import { API_BASE_URL } from '@/lib/api';
+import { getPriorityString, getStatusString, getPriorityColor, getStatusColor, resolveAvatar, formatDate } from '@/lib/taskUtils';
 import { TaskChatModal } from './chat/TaskChatModal';
 
 interface TaskDetailsModalProps {
@@ -195,31 +197,6 @@ export function TaskDetailsModal({ taskId, isOpen, onClose, onDeleted, onUpdated
 
     if (!isOpen) return null;
 
-    const getPriorityString = (val: number | string) => {
-        if (typeof val === 'string') return val;
-        return ['Low', 'Medium', 'High', 'Urgent'][val as number] ?? 'Medium';
-    };
-    const getStatusString = (val: number | string) => {
-        if (typeof val === 'string') return val;
-        return ['Todo', 'InProgress', 'Done', 'Cancelled'][val as number] ?? 'Todo';
-    };
-    const getStatusColor = (raw: number | string) => {
-        const s = getStatusString(raw);
-        return s === 'Done' ? 'var(--success)' : s === 'InProgress' ? 'var(--warning)' : s === 'Cancelled' ? 'var(--danger)' : 'var(--text-muted)';
-    };
-    const getPriorityColor = (raw: number | string) => {
-        const p = getPriorityString(raw);
-        return p === 'Urgent' ? 'var(--danger)' : p === 'High' ? 'var(--warning)' : p === 'Medium' ? 'var(--primary)' : 'var(--success)';
-    };
-    const formatDate = (d: string | null | undefined) =>
-        d ? new Date(d).toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
-
-    const avatarUrl = (raw: string | null | undefined) => {
-        if (!raw) return null;
-        const base = API_BASE_URL.replace(/\/$/, '');
-        const path = raw.startsWith('/') ? raw : `/${raw}`;
-        return raw.startsWith('http') ? raw : `${base}${path}`;
-    };
 
     const inputStyle: React.CSSProperties = {
         width: '100%', padding: '0.55rem 0.8rem', borderRadius: '8px',
@@ -391,7 +368,7 @@ export function TaskDetailsModal({ taskId, isOpen, onClose, onDeleted, onUpdated
                                             <div key={i}>
                                                 <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '0.15rem' }}>{label as string}</span>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.875rem', fontWeight: 500 }}>
-                                                    {icon as React.ReactNode} {value as string}
+                                                    {icon as React.ReactNode} {formatDate(value as string, locale)}
                                                 </div>
                                             </div>
                                         ))}
@@ -449,8 +426,8 @@ export function TaskDetailsModal({ taskId, isOpen, onClose, onDeleted, onUpdated
                                             ? <p style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '0.875rem', margin: 0 }}>{t('noAssignees')}</p>
                                             : task.assignees.map(a => (
                                                 <div key={a.userId} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'var(--surface)', padding: '0.5rem 0.75rem', borderRadius: '10px' }}>
-                                                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
-                                                        {avatarUrl(a.avatarUrl) ? <img src={avatarUrl(a.avatarUrl)!} alt={a.userName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <UserIcon size={15} color="white" />}
+                                                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
+                                                        {resolveAvatar(a.avatarUrl, API_BASE_URL) ? <Image src={resolveAvatar(a.avatarUrl, API_BASE_URL)!} alt={a.userName} fill style={{ objectFit: 'cover' }} sizes="32px" /> : <UserIcon size={15} color="white" />}
                                                     </div>
                                                     <div style={{ flex: 1 }}>
                                                         <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>{a.fullName || a.userName}</p>

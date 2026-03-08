@@ -1,12 +1,20 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import { TaskService, TaskSummaryResponse } from '@/services/task.service';
 import { Calendar, User as UserIcon, AlertCircle, RotateCw } from 'lucide-react';
 import { API_BASE_URL } from '@/lib/api';
-import { CreateTaskButton } from '@/components/CreateTaskButton';
-import { TaskDetailsModal } from '@/components/TaskDetailsModal';
+import { getPriorityString, getStatusString, getPriorityColor, getStatusColor, resolveAvatar } from '@/lib/taskUtils';
+
+const CreateTaskButton = dynamic(() => import('@/components/CreateTaskButton').then(mod => mod.CreateTaskButton), {
+    loading: () => <div style={{ height: '40px', width: '120px', background: 'var(--surface-hover)', borderRadius: '8px', animation: 'pulse 1.5s infinite' }} />
+});
+const TaskDetailsModal = dynamic(() => import('@/components/TaskDetailsModal').then(mod => mod.TaskDetailsModal), {
+    ssr: false
+});
 
 export default function MyTasksPage() {
     const t = useTranslations('Tasks');
@@ -37,54 +45,13 @@ export default function MyTasksPage() {
         }
     };
 
-    const getPriorityString = (val: number | string) => {
-        if (typeof val === 'string') return val;
-        switch (val) {
-            case 0: return 'Low';
-            case 1: return 'Medium';
-            case 2: return 'High';
-            case 3: return 'Urgent';
-            default: return 'Medium';
-        }
-    }
 
-    const getStatusString = (val: number | string) => {
-        if (typeof val === 'string') return val;
-        switch (val) {
-            case 0: return 'Todo';
-            case 1: return 'InProgress';
-            case 2: return 'Done';
-            case 3: return 'Cancelled';
-            default: return 'Todo';
-        }
-    }
-
-    const getPriorityColor = (rawPriority: number | string) => {
-        const priority = getPriorityString(rawPriority);
-        switch (priority) {
-            case 'Urgent': return 'var(--danger)';
-            case 'High': return 'var(--warning)';
-            case 'Medium': return 'var(--primary)';
-            case 'Low': return 'var(--success)';
-            default: return 'var(--text-muted)';
-        }
-    };
-
-    const getStatusColor = (rawStatus: number | string) => {
-        const status = getStatusString(rawStatus);
-        switch (status) {
-            case 'Done': return 'var(--success)';
-            case 'InProgress': return 'var(--warning)';
-            case 'Todo': return 'var(--text-muted)';
-            case 'Cancelled': return 'var(--danger)';
-            default: return 'var(--border)';
-        }
-    };
-
-    const filteredTasks = tasks.filter(task => {
-        if (filter === 'all') return true;
-        return task.status.toString() === filter;
-    });
+    const filteredTasks = useMemo(() => {
+        return tasks.filter(task => {
+            if (filter === 'all') return true;
+            return task.status.toString() === filter;
+        });
+    }, [tasks, filter]);
 
     return (
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1rem', width: '100%' }}>
@@ -192,13 +159,11 @@ export default function MyTasksPage() {
                                 <div style={{ display: 'flex', paddingTop: '0.5rem', gap: '0.25rem' }}>
                                     {task.assignees.slice(0, 5).map((assignee, idx) => {
                                         const rawAvatarUrl = (assignee as any).AvatarUrl || assignee.avatarUrl;
-                                        const normalizedApiBaseUrl = API_BASE_URL.replace(/\/$/, '');
-                                        const normalizedAvatarPath = rawAvatarUrl ? (rawAvatarUrl.startsWith('/') ? rawAvatarUrl : `/${rawAvatarUrl}`) : '';
-                                        const finalAvatarUrl = rawAvatarUrl ? (rawAvatarUrl.startsWith('http') ? rawAvatarUrl : `${normalizedApiBaseUrl}${normalizedAvatarPath}`) : null;
+                                        const finalAvatarUrl = resolveAvatar(rawAvatarUrl, API_BASE_URL);
 
                                         return (
-                                            <div key={assignee.userId} style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--surface-hover)', border: '2px solid var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginLeft: isRtl ? (idx > 0 ? '-10px' : '0') : '0', marginRight: !isRtl ? (idx > 0 ? '-10px' : '0') : '0', zIndex: 10 - idx }} title={assignee.fullName || assignee.userName}>
-                                                {finalAvatarUrl ? <img src={finalAvatarUrl} alt={assignee.userName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <UserIcon size={12} color="var(--text-muted)" />}
+                                            <div key={assignee.userId} style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--surface-hover)', border: '2px solid var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginLeft: isRtl ? (idx > 0 ? '-10px' : '0') : '0', marginRight: !isRtl ? (idx > 0 ? '-10px' : '0') : '0', zIndex: 10 - idx, position: 'relative' }} title={assignee.fullName || assignee.userName}>
+                                                {finalAvatarUrl ? <Image src={finalAvatarUrl} alt={assignee.userName} fill style={{ objectFit: 'cover' }} sizes="40px" /> : <UserIcon size={12} color="var(--text-muted)" />}
                                             </div>
                                         );
                                     })}
