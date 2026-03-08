@@ -355,7 +355,16 @@ a {
 .dashboard-content {
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+}
+
+.dashboard-content::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
 }
 
 /* Hamburger button — hidden on desktop */
@@ -407,6 +416,79 @@ a {
   .settings-grid-3,
   .settings-grid-2 {
     grid-template-columns: 1fr !important;
+  }
+
+  /* Responsive Table to Cards */
+  .responsive-table,
+  .responsive-table thead,
+  .responsive-table tbody,
+  .responsive-table th,
+  .responsive-table td,
+  .responsive-table tr {
+    display: block;
+    width: 100%;
+  }
+
+  .responsive-table thead {
+    display: none;
+  }
+
+  .responsive-table tr {
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .responsive-table td {
+    border: none !important;
+    position: relative;
+    padding: 0.75rem 0.5rem 0.75rem 45% !important;
+    text-align: right !important;
+    min-height: 2.5rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .responsive-table td:not(:last-child) {
+    border-bottom: 1px solid var(--surface-border) !important;
+  }
+
+  .responsive-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 1rem;
+    width: 40%;
+    padding-right: 10px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  .rtl .responsive-table td {
+    padding: 0.75rem 45% 0.75rem 0.5rem !important;
+    text-align: left !important;
+    justify-content: flex-start;
+  }
+
+  .rtl .responsive-table td::before {
+    left: auto;
+    right: 1rem;
+    padding-right: 0;
+    padding-left: 10px;
+    text-align: right;
+  }
+
+  /* Hide description on mobile */
+  .responsive-table .task-description {
+    display: none !important;
   }
 }
 

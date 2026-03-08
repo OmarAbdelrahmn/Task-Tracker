@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { LayoutDashboard, Settings, User, ShieldCheck, ListTodo, MessageSquare } from 'lucide-react';
+import { Settings, User, ShieldCheck, ListTodo, MessageSquare } from 'lucide-react';
 import { ConversationService } from '@/services/conversation.service';
 import { useSignalR } from '@/lib/useSignalR';
 import TokenManager from '@/lib/TokenManager';
@@ -11,12 +11,12 @@ interface SidebarNavProps {
     locale: string;
     userRole: string;
     labels: {
-        overview: string;
         myTasks: string;
         profile: string;
         messages: string;
         settings: string;
         adminPanel: string;
+        reports: string;
     };
 }
 
@@ -62,9 +62,9 @@ export function SidebarNav({ locale, userRole, labels }: SidebarNavProps) {
     });
 
     const navItems = [
-        { href: `/${locale}/dashboard`, label: labels.overview, icon: <LayoutDashboard size={18} /> },
         { href: `/${locale}/dashboard/tasks`, label: labels.myTasks, icon: <ListTodo size={18} /> },
         { href: `/${locale}/dashboard/messages`, label: labels.messages, icon: <MessageSquare size={18} /> },
+        { href: `/${locale}/dashboard/reports`, label: labels.reports, icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bar-chart-2"><line x1="18" x2="18" y1="20" y2="10" /><line x1="12" x2="12" y1="20" y2="4" /><line x1="6" x2="6" y1="20" y2="14" /></svg> },
         { href: `/${locale}/dashboard/profile`, label: labels.profile, icon: <User size={18} /> },
         { href: `/${locale}/dashboard/settings`, label: labels.settings, icon: <Settings size={18} /> },
         ...(userRole === 'Admin'
@@ -73,8 +73,6 @@ export function SidebarNav({ locale, userRole, labels }: SidebarNavProps) {
     ];
 
     const isActive = (href: string) => {
-        // Exact match for dashboard root, prefix match for sub-pages
-        if (href === `/${locale}/dashboard`) return pathname === href;
         return pathname.startsWith(href);
     };
 

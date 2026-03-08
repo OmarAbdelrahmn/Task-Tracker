@@ -145,7 +145,7 @@ export default function MyTasksPage() {
                     <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '1rem' }}>{t('noTasksFound') || 'No tasks found.'}</p>
                 </div>
             ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
                     {filteredTasks.map(task => (
                         <div key={task.id} className="glass-card animate-fade-in" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem', cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s' }} onClick={() => { setSelectedTaskId(task.id); setIsDetailsOpen(true); }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'none'}>
 
@@ -197,13 +197,13 @@ export default function MyTasksPage() {
                                         const finalAvatarUrl = rawAvatarUrl ? (rawAvatarUrl.startsWith('http') ? rawAvatarUrl : `${normalizedApiBaseUrl}${normalizedAvatarPath}`) : null;
 
                                         return (
-                                            <div key={assignee.userId} style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--surface-hover)', border: '2px solid var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginLeft: isRtl ? (idx > 0 ? '-10px' : '0') : '0', marginRight: !isRtl ? (idx > 0 ? '-10px' : '0') : '0', zIndex: 10 - idx }} title={assignee.fullName || assignee.userName}>
+                                            <div key={assignee.userId} style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--surface-hover)', border: '2px solid var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginLeft: isRtl ? (idx > 0 ? '-10px' : '0') : '0', marginRight: !isRtl ? (idx > 0 ? '-10px' : '0') : '0', zIndex: 10 - idx }} title={assignee.fullName || assignee.userName}>
                                                 {finalAvatarUrl ? <img src={finalAvatarUrl} alt={assignee.userName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <UserIcon size={12} color="var(--text-muted)" />}
                                             </div>
                                         );
                                     })}
                                     {task.assignees.length > 5 && (
-                                        <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--surface-hover)', border: '2px solid var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 600, color: 'var(--text-muted)', marginLeft: isRtl ? '-10px' : '0', marginRight: !isRtl ? '-10px' : '0', zIndex: 0 }}>
+                                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--surface-hover)', border: '2px solid var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 600, color: 'var(--text-muted)', marginLeft: isRtl ? '-10px' : '0', marginRight: !isRtl ? '-10px' : '0', zIndex: 0 }}>
                                             +{task.assignees.length - 5}
                                         </div>
                                     )}

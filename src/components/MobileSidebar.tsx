@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Menu, X, LayoutDashboard, Settings, User, ShieldCheck, MessageSquare } from 'lucide-react';
+import { Menu, X, Settings, User, ShieldCheck, MessageSquare, ListTodo } from 'lucide-react';
 
 interface MobileSidebarProps {
     locale: string;
@@ -9,11 +9,11 @@ interface MobileSidebarProps {
     labels: {
         appName: string;
         userPortal: string;
-        overview: string;
         myTasks: string;
         adminPanel: string;
         settings: string;
         messages: string;
+        reports: string;
         profile: string;
         logout: string;
     };
@@ -36,9 +36,9 @@ export function MobileSidebar({ locale, userRole, labels, LogoutButtonComponent 
     }, [open]);
 
     const navItems = [
-        { href: `/${locale}/dashboard`, label: labels.overview, icon: <LayoutDashboard size={18} /> },
-        { href: `/${locale}/dashboard/tasks`, label: labels.myTasks, icon: <LayoutDashboard size={18} /> },
+        { href: `/${locale}/dashboard/tasks`, label: labels.myTasks, icon: <ListTodo size={18} /> },
         { href: `/${locale}/dashboard/messages`, label: labels.messages, icon: <MessageSquare size={18} /> },
+        { href: `/${locale}/dashboard/reports`, label: labels.reports, icon: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bar-chart-2"><line x1="18" x2="18" y1="20" y2="10" /><line x1="12" x2="12" y1="20" y2="4" /><line x1="6" x2="6" y1="20" y2="14" /></svg> },
         { href: `/${locale}/dashboard/profile`, label: labels.profile, icon: <User size={18} /> },
         { href: `/${locale}/dashboard/settings`, label: labels.settings, icon: <Settings size={18} /> },
         ...(userRole === 'Admin' ? [{ href: `/${locale}/dashboard/admin`, label: labels.adminPanel, icon: <ShieldCheck size={18} /> }] : []),
@@ -102,21 +102,17 @@ export function MobileSidebar({ locale, userRole, labels, LogoutButtonComponent 
                 }}
             >
                 {/* Drawer header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
-                    <div>
-                        <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--primary)' }}>
-                            {labels.appName}
-                        </h2>
-                        <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                            {userRole} {labels.userPortal}
-                        </span>
-                    </div>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '2rem', position: 'relative' }}>
+                    <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--primary)', textAlign: 'center', margin: 0 }}>
+                        {labels.appName}
+                    </h2>
                     <button
                         onClick={() => setOpen(false)}
                         aria-label="Close menu"
                         style={{
                             background: 'none', border: 'none', cursor: 'pointer',
                             color: 'var(--text-muted)', display: 'flex', padding: '0.25rem',
+                            position: 'absolute', [isRtl ? 'left' : 'right']: 0,
                         }}
                     >
                         <X size={22} />

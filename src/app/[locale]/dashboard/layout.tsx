@@ -5,7 +5,7 @@ import { LogoutButton } from '@/components/LogoutButton';
 import { UserAvatarButton } from '@/components/UserAvatarButton';
 import { MobileSidebar } from '@/components/MobileSidebar';
 import { SidebarNav } from '@/components/SidebarNav';
-import { LayoutDashboard, Settings, User, ShieldCheck } from 'lucide-react';
+import { Settings, User, ShieldCheck } from 'lucide-react';
 
 export default async function DashboardLayout({
     children,
@@ -31,18 +31,19 @@ export default async function DashboardLayout({
     const labels = {
         appName: t('appName'),
         userPortal: t('userPortal'),
-        overview: t('overview'),
         myTasks: tm('myTasks'),
         adminPanel: t('adminPanel'),
         settings: t('settings'),
         profile: tp('title'),
         logout: t('logout'),
         messages: t('messages'),
+        reports: t('reports'),
     };
 
     const navItems = [
-        { href: `/${locale}/dashboard`, label: t('overview'), icon: 'overview' },
+        { href: `/${locale}/dashboard/tasks`, label: tm('myTasks'), icon: 'tasks' },
         { href: `/${locale}/dashboard/messages`, label: t('messages'), icon: 'messages' },
+        { href: `/${locale}/dashboard/reports`, label: t('reports'), icon: 'reports' },
         { href: `/${locale}/dashboard/profile`, label: tp('title'), icon: 'profile' },
         { href: `/${locale}/dashboard/settings`, label: t('settings'), icon: 'settings' },
         ...(userRole === 'Admin' ? [{ href: `/${locale}/dashboard/admin`, label: t('adminPanel'), icon: 'admin' }] : []),
@@ -52,9 +53,8 @@ export default async function DashboardLayout({
         <div className={`dashboard-root${isRtl ? ' rtl' : ''}`}>
             {/* ── Desktop Sidebar (hidden on mobile) ── */}
             <aside className="glass desktop-sidebar">
-                <div className="sidebar-brand-block">
-                    <h2 className="sidebar-title">{t('appName')}</h2>
-                    <span className="sidebar-role"> {t('userPortal')}   {userRole}</span>
+                <div className="sidebar-brand-block" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <h2 className="sidebar-title" style={{ textAlign: 'center', margin: 0 }}>{t('appName')}</h2>
                 </div>
 
                 <SidebarNav locale={locale} userRole={userRole} labels={labels} />
