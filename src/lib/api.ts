@@ -21,27 +21,45 @@ api.interceptors.request.use((config) => {
     return Promise.reject(error);
 });
 
+let isRefreshing = false;
+let refreshQueue: Array<(token: string) => void> = [];
+
+const processQueue = (token: string | null) => {
+    refreshQueue.forEach((cb) => cb(token || ''));
+    refreshQueue = [];
+};
+
 // Response interceptor to handle 401 & refresh token logic
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
 
-        // Bypass refresh logic and redirect if the original request was for authentication
-        if (originalRequest.url?.includes('/api/Auth/signin') || originalRequest.url?.includes('/api/Auth/register')) {
+        if (!originalRequest || originalRequest.url?.includes('/api/Auth/signin') || originalRequest.url?.includes('/api/Auth/register')) {
             return Promise.reject(error);
         }
 
         if (error.response?.status === 401 && !originalRequest._retry) {
+            if (isRefreshing) {
+                return new Promise((resolve) => {
+                    refreshQueue.push((token: string) => {
+                        originalRequest.headers.Authorization = `Bearer ${token}`;
+                        resolve(api(originalRequest));
+                    });
+                });
+            }
+
             originalRequest._retry = true;
+            isRefreshing = true;
+
             try {
                 const refreshToken = TokenManager.getRefreshToken();
+                const accessToken = TokenManager.getAccessToken();
                 if (!refreshToken) throw new Error('No refresh token available');
 
-                // Note: The specific refresh token URL/body depends on the API specification
-                const response = await axios.post(`${API_BASE_URL}api/Auth/refresh`, {
+                const response = await axios.post(`${API_BASE_URL}/api/Auth/refresh`, {
                     refreshToken: refreshToken,
-                    token: TokenManager.getAccessToken()
+                    token: accessToken
                 });
 
                 const newAccessToken = response.data.token;
@@ -53,19 +71,24 @@ api.interceptors.response.use(
                     const role = typeof window !== 'undefined' ? TokenManager.extractRoleFromToken(newAccessToken) : undefined;
                     TokenManager.setTokens(newAccessToken, newRefreshToken, role, expiresIn, refreshTokenExpiration);
 
+                    isRefreshing = false;
+                    processQueue(newAccessToken);
+
                     originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
                     return api(originalRequest);
                 }
             } catch (refreshError) {
-                // Refresh failed, clear tokens and redirect to login
+                isRefreshing = false;
+                processQueue(null);
                 TokenManager.clearTokens();
                 if (typeof window !== 'undefined') {
-                    // Relies on middleware to prepend locale
                     window.location.href = '/login';
                 }
                 return Promise.reject(refreshError);
             }
         }
+
         return Promise.reject(error);
     }
 );
+
