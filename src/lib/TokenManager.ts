@@ -18,17 +18,25 @@ class TokenManager {
     }
 
     static setTokens(accessToken: string, refreshToken?: string, role?: string, expiresIn?: number, refreshTokenExpiration?: string): void {
+        // Use refreshTokenExpiration for the access token cookie too — this ensures the
+        // (possibly expired) JWT stays in the cookie so the refresh endpoint can receive it.
+        // The JWT's own `exp` claim will cause 401s that trigger a refresh via the interceptor.
+        const refreshExpiry = refreshTokenExpiration ? new Date(refreshTokenExpiration) : undefined;
+
         const accessCookieOpts: Cookies.CookieAttributes = { secure: true, sameSite: 'strict' };
-        if (expiresIn) {
-            accessCookieOpts.expires = new Date(new Date().getTime() + expiresIn * 1000);
+        if (refreshExpiry) {
+            accessCookieOpts.expires = refreshExpiry;
         }
+
+        console.log(`[TokenManager] Setting Access Token. JWT expires in: ${expiresIn}s. Cookie expires at: ${refreshExpiry?.toLocaleString() || 'Session'}`);
         Cookies.set(ACCESS_TOKEN_KEY, accessToken, accessCookieOpts);
 
         if (refreshToken) {
             const refreshCookieOpts: Cookies.CookieAttributes = { secure: true, sameSite: 'strict' };
-            if (refreshTokenExpiration) {
-                refreshCookieOpts.expires = new Date(refreshTokenExpiration);
+            if (refreshExpiry) {
+                refreshCookieOpts.expires = refreshExpiry;
             }
+            console.log(`[TokenManager] Setting Refresh Token. Expires at: ${refreshExpiry?.toLocaleString() || 'Session'}`);
             Cookies.set(REFRESH_TOKEN_KEY, refreshToken, refreshCookieOpts);
         }
 

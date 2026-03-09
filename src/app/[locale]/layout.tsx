@@ -6,17 +6,20 @@ import { Inter, Cairo } from 'next/font/google';
 import '../globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { AccentColorProvider } from '@/components/AccentColorProvider';
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const cairo = Cairo({ subsets: ['arabic'], variable: '--font-cairo' });
+
+export const viewport: Viewport = {
+    themeColor: "#0D0D0D",
+};
 
 export const metadata: Metadata = {
     title: "Task Manager — Real-Time Task & Team Collaboration",
     description: "Task Manager brings your team's tasks and conversations into one real-time workspace. Assign work, track progress, and message teammates — all without switching tabs.",
     keywords: ["task manager", "team collaboration", "real-time chat", "project management", "task tracking"],
     authors: [{ name: "Task Manager" }],
-    themeColor: "#0D0D0D",
     appleWebApp: {
         capable: true,
         statusBarStyle: "default",

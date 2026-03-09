@@ -7,6 +7,24 @@ import { MobileSidebar } from '@/components/MobileSidebar';
 import { SidebarNav } from '@/components/SidebarNav';
 import { Settings, User, ShieldCheck } from 'lucide-react';
 
+const API_BASE_URL = 'https://taskmanager.premiumasp.net';
+
+function extractRoleFromToken(token: string): string {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            Buffer.from(base64, 'base64').toString('utf-8').split('').map((c: string) =>
+                '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+            ).join('')
+        );
+        const payload = JSON.parse(jsonPayload);
+        return payload.roles && payload.roles.length > 0 ? payload.roles[0] : 'User';
+    } catch {
+        return 'User';
+    }
+}
+
 export default async function DashboardLayout({
     children,
     params
@@ -16,7 +34,52 @@ export default async function DashboardLayout({
 }) {
     const { locale } = await params;
     const cookieStore = await cookies();
-    const token = cookieStore.get('accessToken')?.value;
+    let token = cookieStore.get('accessToken')?.value;
+    const refreshToken = cookieStore.get('refreshToken')?.value;
+
+    // If accessToken is missing but refreshToken exists, try a server-side refresh
+    if (!token && refreshToken) {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/Auth/refresh`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: cookieStore.get('accessToken')?.value ?? '', refreshToken }),
+                cache: 'no-store',
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                const newAccessToken = data.token;
+                const newRefreshToken = data.refreshToken;
+
+                if (newAccessToken) {
+                    token = newAccessToken;
+                    const role = extractRoleFromToken(newAccessToken);
+                    const accessExpires = data.expiresIn
+                        ? new Date(Date.now() + data.expiresIn * 1000).toUTCString()
+                        : '';
+                    const refreshExpires = data.refreshTokenExpiration
+                        ? new Date(data.refreshTokenExpiration).toUTCString()
+                        : '';
+
+                    // Set cookies in the response headers via Next.js cookies() API
+                    cookieStore.set('accessToken', newAccessToken, {
+                        secure: true, sameSite: 'strict',
+                        ...(accessExpires ? { expires: new Date(accessExpires) } : {})
+                    });
+                    cookieStore.set('userRole', role, { secure: true, sameSite: 'strict' });
+                    if (newRefreshToken) {
+                        cookieStore.set('refreshToken', newRefreshToken, {
+                            secure: true, sameSite: 'strict',
+                            ...(refreshExpires ? { expires: new Date(refreshExpires) } : {})
+                        });
+                    }
+                }
+            }
+        } catch {
+            // Refresh failed — will fall through to redirect below
+        }
+    }
 
     if (!token) {
         redirect(`/${locale}/login`);
