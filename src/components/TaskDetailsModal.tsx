@@ -10,7 +10,7 @@ import {
     Save, Plus, UserMinus, Loader2, MessageSquare
 } from 'lucide-react';
 import { API_BASE_URL } from '@/lib/api';
-import { getPriorityString, getStatusString, getPriorityColor, getStatusColor, resolveAvatar, formatDate } from '@/lib/taskUtils';
+import { getPriorityString, getStatusString, getPriorityColor, getStatusColor, resolveAvatar, formatDate, formatDateShort } from '@/lib/taskUtils';
 import { TaskChatModal } from './chat/TaskChatModal';
 
 interface TaskDetailsModalProps {
@@ -368,7 +368,9 @@ export function TaskDetailsModal({ taskId, isOpen, onClose, onDeleted, onUpdated
                                             <div key={i}>
                                                 <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '0.15rem' }}>{label as string}</span>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.875rem', fontWeight: 500 }}>
-                                                    {icon as React.ReactNode} {formatDate(value as string, locale)}
+                                                    {icon as React.ReactNode}{' '}
+                                                    <span className="date-full">{formatDate(value as string, locale)}</span>
+                                                    <span className="date-short">{formatDateShort(value as string, locale)}</span>
                                                 </div>
                                             </div>
                                         ))}

@@ -506,3 +506,18 @@ a {
     font-size: 1.4rem;
   }
 }
+
+/* Responsive Date Helpers */
+.date-short {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .date-full {
+    display: none;
+  }
+
+  .date-short {
+    display: inline;
+  }
+}

@@ -51,3 +51,6 @@ export const resolveAvatar = (url: string | null | undefined, apiBaseUrl: string
 
 export const formatDate = (d: string | null | undefined, locale: string = 'en') =>
     d ? new Date(d).toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
+
+export const formatDateShort = (d: string | null | undefined, locale: string = 'en') =>
+    d ? new Date(d).toLocaleDateString(locale, { year: 'numeric',month: 'short', day: 'numeric' }) : '-';

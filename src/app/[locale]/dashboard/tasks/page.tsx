@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { TaskService, TaskSummaryResponse } from '@/services/task.service';
 import { Calendar, User as UserIcon, AlertCircle, RotateCw } from 'lucide-react';
 import { API_BASE_URL } from '@/lib/api';
-import { getPriorityString, getStatusString, getPriorityColor, getStatusColor, resolveAvatar } from '@/lib/taskUtils';
+import { getPriorityString, getStatusString, getPriorityColor, getStatusColor, resolveAvatar, formatDateShort } from '@/lib/taskUtils';
 
 const CreateTaskButton = dynamic(() => import('@/components/CreateTaskButton').then(mod => mod.CreateTaskButton), {
     loading: () => <div style={{ height: '40px', width: '120px', background: 'var(--surface-hover)', borderRadius: '8px', animation: 'pulse 1.5s infinite' }} />
@@ -141,7 +141,15 @@ export default function MyTasksPage() {
                             {task.dueDate && (
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
                                     <Calendar size={14} />
-                                    <span>{t('dueDateLabel')} {new Date(task.dueDate).toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                                    <span>
+                                        {t('dueDateLabel')}{' '}
+                                        <span className="date-full">
+                                            {new Date(task.dueDate).toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                        <span className="date-short">
+                                            {formatDateShort(task.dueDate, locale)}
+                                        </span>
+                                    </span>
                                 </div>
                             )}
 

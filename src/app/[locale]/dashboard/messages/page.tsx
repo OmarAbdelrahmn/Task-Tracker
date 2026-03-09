@@ -11,6 +11,7 @@ import { Users, User, MessageSquarePlus, Loader2, ArrowLeft, Check, X, Search, E
 import TokenManager from '@/lib/TokenManager';
 import { API_BASE_URL } from '@/lib/api';
 import { parseApiDate } from '@/lib/dateUtils';
+import { formatDateShort } from '@/lib/taskUtils';
 
 export default function MessagesPage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = use(params);
@@ -167,7 +168,7 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
     };
 
     // WhatsApp-style relative timestamp
-    const formatTimestamp = (isoString: string | null | undefined): string => {
+    const formatTimestamp = (isoString: string | null | undefined): React.ReactNode => {
         if (!isoString) return '';
         const date = parseApiDate(isoString);
         const now = new Date();
@@ -179,7 +180,12 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
         } else if (date >= yesterdayStart) {
             return 'Yesterday';
         } else {
-            return date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
+            return (
+                <>
+                    <span className="date-full">{date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+                    <span className="date-short">{formatDateShort(isoString)}</span>
+                </>
+            );
         }
     };
 
@@ -776,7 +782,10 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
                                                 <div key={msg.id} style={{ background: 'var(--surface)', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--surface-border)' }}>
                                                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                                                         <span style={{ fontWeight: 600 }}>{msg.senderName}</span>
-                                                        <span>{new Date(msg.createdAt).toLocaleString()}</span>
+                                                        <span>
+                                                            <span className="date-full">{new Date(msg.createdAt).toLocaleString()}</span>
+                                                            <span className="date-short">{formatDateShort(msg.createdAt)}</span>
+                                                        </span>
                                                     </div>
                                                     <div style={{ fontSize: '0.9rem' }}>{msg.body}</div>
                                                 </div>
@@ -1060,15 +1069,25 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
                                         </div>
                                     ))}
 
-                                    {resolveType(infoDetails.type) === 'group' && (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.5rem' }}>
+                                        {resolveType(infoDetails.type) === 'group' && (
+                                            <button
+                                                onClick={handleLeaveConversation}
+                                                style={{ width: '100%', padding: '0.8rem', borderRadius: '10px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', cursor: 'pointer' }}
+                                            >
+                                                <LogOut size={18} />
+                                                Leave Group
+                                            </button>
+                                        )}
+
                                         <button
-                                            onClick={handleLeaveConversation}
-                                            style={{ width: '100%', marginTop: '1.5rem', padding: '0.8rem', borderRadius: '10px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', cursor: 'pointer' }}
+                                            onClick={handleDeleteConversation}
+                                            style={{ width: '100%', padding: '0.8rem', borderRadius: '10px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', cursor: 'pointer' }}
                                         >
-                                            <LogOut size={18} />
-                                            Leave Group
+                                            <Trash2 size={18} />
+                                            Delete {resolveType(infoDetails.type) === 'taskthread' ? 'Thread' : 'Conversation'}
                                         </button>
-                                    )}
+                                    </div>
                                 </div>
                             ) : (
                                 /* ── Direct chat details ── */

@@ -12,6 +12,7 @@ import {
     Filter, X, CheckCircle2, Circle, Clock, CheckSquare, Archive, AlertCircle,
     BarChart, Repeat, User as UserIcon, Check, MapPin, Search, Calendar, FileText, ChevronRight
 } from 'lucide-react';
+import { formatDateShort } from '@/lib/taskUtils';
 
 type ReportType = 'summary' | 'dailyTasks';
 
@@ -253,7 +254,12 @@ export default function ReportsPage() {
                 {getPriorityBadge(task.priority)}
             </td>
             <td data-label={t('colDue')} style={{ padding: '1rem 1.5rem', color: 'var(--text-secondary)' }}>
-                {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '—'}
+                {task.dueDate ? (
+                    <>
+                        <span className="date-full">{new Date(task.dueDate).toLocaleDateString()}</span>
+                        <span className="date-short">{formatDateShort(task.dueDate)}</span>
+                    </>
+                ) : '—'}
                 {task.isOverdue && (
                     <span style={{ display: 'inline-block', marginLeft: '0.5rem', fontSize: '0.75rem', padding: '2px 6px', borderRadius: '4px', background: 'color-mix(in srgb, var(--danger) 15%, transparent)', color: 'var(--danger)' }}>
                         {t('isOverdue')}
