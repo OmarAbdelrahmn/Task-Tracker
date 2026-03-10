@@ -144,7 +144,8 @@
         "confirmDelete": "Are you sure you want to delete this task?",
         "confirmDeleteYes": "Delete",
         "addAssignee": "Add",
-        "removeAssignee": "Remove"
+        "removeAssignee": "Remove",
+        "noTasksFound": "No tasks found."
     },
     "Messages": {
         "discussion": "Discussion",

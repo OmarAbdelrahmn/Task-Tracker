@@ -145,7 +145,8 @@
         "confirmDelete": "هل أنت متأكد من حذف هذه المهمة؟",
         "confirmDeleteYes": "حذف",
         "addAssignee": "إضافة",
-        "removeAssignee": "إزالة"
+        "removeAssignee": "إزالة",
+        "noTasksFound": "لا توجد مهام"
     },
     "Messages": {
         "discussion": "المناقشة",

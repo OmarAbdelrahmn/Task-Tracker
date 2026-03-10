@@ -127,6 +127,15 @@ a {
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
+.task-card {
+  padding: 1.25rem;
+  gap: 1rem;
+}
+
+.task-card-footer {
+  padding-top: 1rem;
+}
+
 /* Forms and Buttons */
 .btn {
   display: inline-flex;
@@ -532,5 +541,23 @@ a {
 
   .date-short {
     display: inline;
+  }
+}
+
+@media (max-width: 768px) {
+  .task-card {
+    padding: 1.05rem !important;
+    gap: 0.85rem !important;
+  }
+
+  .task-card-footer {
+    padding-top: 0.85rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .task-card {
+    padding: 0.85rem !important;
+    /* Scale down even further for small mobile */
   }
 }

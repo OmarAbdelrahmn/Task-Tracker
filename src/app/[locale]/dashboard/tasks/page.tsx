@@ -108,13 +108,13 @@ export default function MyTasksPage() {
                     ))}
                 </div>
             ) : filteredTasks.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '4rem 1rem', background: 'var(--surface, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--border)' }}>
+                <div style={{ textAlign: 'center', padding: '4rem 1rem', background: 'var(--surface, rgba(255,255,255,0.02))', borderRadius: '16px', border: '1px dashed var(--surface-border)' }}>
                     <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '1rem' }}>{t('noTasksFound') || 'No tasks found.'}</p>
                 </div>
             ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
                     {filteredTasks.map(task => (
-                        <div key={task.id} className="glass-card animate-fade-in" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem', cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s' }} onClick={() => { setSelectedTaskId(task.id); setIsDetailsOpen(true); }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'none'}>
+                        <div key={task.id} className="glass-card task-card animate-fade-in" style={{ display: 'flex', flexDirection: 'column', cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s' }} onClick={() => { setSelectedTaskId(task.id); setIsDetailsOpen(true); }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'none'}>
 
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600, color: 'var(--foreground)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
@@ -153,13 +153,13 @@ export default function MyTasksPage() {
                                 </div>
                             )}
 
-                            <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
+                            <div className="task-card-footer" style={{ marginTop: 'auto', borderTop: '1px solid var(--surface-border)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>{t('progress')}</span>
                                     <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--foreground)' }}>{task.progress}%</span>
                                 </div>
-                                <div style={{ width: '100%', height: '6px', background: 'var(--border)', borderRadius: '3px', overflow: 'hidden' }}>
-                                    <div style={{ height: '100%', width: `${task.progress}%`, background: task.progress === 100 ? 'var(--success)' : 'var(--primary)', borderRadius: '3px', transition: 'width 0.5s ease' }} />
+                                <div style={{ width: '100%', height: '6px', background: 'var(--surface-border)', borderRadius: '3px', overflow: 'hidden' }}>
+                                    <div style={{ height: '100%', width: `${task.progress || 0}%`, background: task.progress === 100 ? 'var(--success)' : 'var(--primary)', borderRadius: '3px', transition: 'width 0.5s ease' }} />
                                 </div>
                             </div>
 
