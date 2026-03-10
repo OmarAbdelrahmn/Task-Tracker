@@ -68,8 +68,31 @@ export interface UnreadCountResponse {
 }
 
 export class ConversationService {
-    static async getConversations(): Promise<ConversationSummary[]> {
+    static async getConversations(forceRefresh = false): Promise<ConversationSummary[]> {
+        if (!forceRefresh && typeof window !== 'undefined') {
+            const cached = localStorage.getItem('cachedConversations');
+            if (cached) {
+                // Kick off a background refresh to keep cache perfectly fresh
+                api.get<ConversationSummary[]>('/api/conversations', { headers: getHeaders() })
+                    .then(response => {
+                        localStorage.setItem('cachedConversations', JSON.stringify(response.data));
+                        // A more robust implementation would fire an event here to update UI if needed.
+                        // But for now, returning the cache immediately makes the initial load fast.
+                    })
+                    .catch(err => console.error('Background conversation fresh failed', err));
+
+                try {
+                    return JSON.parse(cached);
+                } catch (e) {
+                    console.error('Failed to parse cached conversations', e);
+                }
+            }
+        }
+
         const response = await api.get<ConversationSummary[]>('/api/conversations', { headers: getHeaders() });
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('cachedConversations', JSON.stringify(response.data));
+        }
         return response.data;
     }
 

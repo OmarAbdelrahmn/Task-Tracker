@@ -49,6 +49,12 @@ class TokenManager {
         Cookies.remove(ACCESS_TOKEN_KEY);
         Cookies.remove(REFRESH_TOKEN_KEY);
         Cookies.remove(USER_ROLE_KEY);
+        Cookies.remove('avatarUrl');
+
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('userProfile');
+            localStorage.removeItem('cachedConversations');
+        }
     }
 
     static hasValidToken(): boolean {

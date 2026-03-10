@@ -4,6 +4,8 @@ import { useTranslations } from 'next-intl';
 import { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { AuthService } from '@/services/auth.service';
+import { ConversationService } from '@/services/conversation.service';
+import TokenManager from '@/lib/TokenManager';
 import { Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -24,10 +26,25 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
 
         try {
             await AuthService.signIn(userName, password);
-            // Wait for tokens to write, then redirect
-            setTimeout(() => {
-                window.location.href = `/${locale || 'en'}/dashboard`;
-            }, 500);
+
+            // Prefetch user profile and conversations to make dashboard load instantly
+            try {
+                const profile = await AuthService.getMe();
+                localStorage.setItem('userProfile', JSON.stringify(profile));
+                if (profile.avatarUrl) {
+                    const avatarUrl = profile.avatarUrl.startsWith('http') ? profile.avatarUrl : `https://taskmanager.premiumasp.net${profile.avatarUrl.startsWith('/') ? '' : '/'}${profile.avatarUrl}`;
+                    import('js-cookie').then(Cookies => {
+                        Cookies.default.set('avatarUrl', avatarUrl, { secure: true, sameSite: 'strict' });
+                    });
+                }
+
+                const conversations = await ConversationService.getConversations();
+                localStorage.setItem('cachedConversations', JSON.stringify(conversations));
+            } catch (prefetchErr) {
+                console.error('Prefetch failed', prefetchErr);
+            }
+
+            window.location.href = `/${locale || 'en'}/dashboard`;
         } catch (err: any) {
             setError(AuthService.extractErrorMessage(err));
             setLoading(false);

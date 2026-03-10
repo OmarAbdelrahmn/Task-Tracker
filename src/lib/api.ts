@@ -82,7 +82,7 @@ api.interceptors.response.use(
                 processQueue(null);
                 TokenManager.clearTokens();
                 if (typeof window !== 'undefined') {
-                    window.location.href = '/login';
+                    window.location.href = '/en/login';
                 }
                 return Promise.reject(refreshError);
             }

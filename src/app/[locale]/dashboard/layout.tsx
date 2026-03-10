@@ -55,8 +55,8 @@ export default async function DashboardLayout({
                 if (newAccessToken) {
                     token = newAccessToken;
                     const role = extractRoleFromToken(newAccessToken);
-                    const accessExpires = data.expiresIn
-                        ? new Date(Date.now() + data.expiresIn * 1000).toUTCString()
+                    const accessExpires = data.refreshTokenExpiration
+                        ? new Date(data.refreshTokenExpiration).toUTCString()
                         : '';
                     const refreshExpires = data.refreshTokenExpiration
                         ? new Date(data.refreshTokenExpiration).toUTCString()
