@@ -367,6 +367,19 @@ a {
   /* Chrome, Safari, Opera */
 }
 
+/* Hide scrollbar utility */
+.hide-scrollbar {
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
+}
+
 /* Hamburger button — hidden on desktop */
 .mobile-menu-btn {
   display: none !important;

@@ -151,6 +151,7 @@ export function ChatWindow({ conversationId, participants, initialMessages }: Ch
             <div
                 ref={scrollContainerRef}
                 onScroll={handleScroll}
+                className="hide-scrollbar"
                 style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column' }}
             >
                 {isLoadingMore && (

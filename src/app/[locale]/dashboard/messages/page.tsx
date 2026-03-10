@@ -61,6 +61,9 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
     const [currentUserName, setCurrentUserName] = useState<string>('');
     const [currentUserIdStr, setCurrentUserIdStr] = useState<string>(() => TokenManager.getUserIdFromToken());
 
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+
     const loadConversations = async () => {
         setIsLoading(true);
         try {
@@ -536,6 +539,14 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
         }
     });
 
+    if (!mounted) {
+        return (
+            <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                <Loader2 className="spin" size={32} color="var(--primary)" />
+            </div>
+        );
+    }
+
     return (
         <div style={{ display: 'flex', height: '100%', minHeight: 0, gap: isMobile ? 0 : '1rem' }}>
             {/* ─── Sidebar ─── */}
@@ -564,7 +575,7 @@ export default function MessagesPage({ params }: { params: Promise<{ locale: str
                 </div>
 
                 {/* Conversation list */}
-                <div style={{ flex: 1, overflowY: 'auto', padding: '0.5rem' }}>
+                <div className="hide-scrollbar" style={{ flex: 1, overflowY: 'auto', padding: '0.5rem' }}>
                     {isLoading ? (
                         <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
                             <Loader2 className="spin" />
