@@ -90,6 +90,25 @@ export class AuthService {
         return response.data;
     }
 
+    static async refreshToken(): Promise<void> {
+        const accessToken = TokenManager.getAccessToken();
+        const refreshToken = TokenManager.getRefreshToken();
+        if (!refreshToken) return;
+
+        const response = await api.post<AuthResponse>('/api/Auth/refresh', {
+            token: accessToken ?? '',
+            refreshToken,
+        });
+
+        const data = response.data;
+        if (data.token) {
+            const role = typeof window !== 'undefined'
+                ? TokenManager.extractRoleFromToken(data.token)
+                : undefined;
+            TokenManager.setTokens(data.token, data.refreshToken, role, data.expiresIn, data.refreshTokenExpiration);
+        }
+    }
+
     static async logout(): Promise<void> {
         try {
             const token = TokenManager.getAccessToken();

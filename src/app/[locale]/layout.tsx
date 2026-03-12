@@ -6,6 +6,7 @@ import { Inter, Cairo } from 'next/font/google';
 import '../globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { AccentColorProvider } from '@/components/AccentColorProvider';
+import TokenRefresher from '@/components/TokenRefresher';
 import { Metadata, Viewport } from 'next';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -76,6 +77,7 @@ export default async function LocaleLayout({
                 <NextIntlClientProvider messages={messages}>
                     <ThemeProvider>
                         <AccentColorProvider />
+                        <TokenRefresher />
                         {children}
                     </ThemeProvider>
                 </NextIntlClientProvider>
